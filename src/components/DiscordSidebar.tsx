@@ -1,7 +1,10 @@
 
-import { Bot, Hash, Volume2, Settings, Headphones, Mic } from "lucide-react";
+import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 const DiscordSidebar = () => {
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(["text", "voice"]);
+  
   const servers = [
     { id: 1, name: "Discord", icon: "🎮", active: false },
     { id: 2, name: "Server 1", icon: "🔥", active: false },
@@ -9,16 +12,38 @@ const DiscordSidebar = () => {
     { id: 4, name: "Midjourney", icon: "/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png", active: true },
   ];
 
-  const channels = [
+  const dmChannels = [
     { name: "Find or start a conve...", type: "dm" },
-    { name: "JarExt 🔴MSU", type: "dm", status: "online" },
+    { name: "User 1 🔴MSU", type: "dm", status: "online" },
     { name: "Tickets", type: "dm" },
-    { name: "deleted_user...", type: "dm" },
-    { name: "HK, elw0n, G...", type: "dm", members: "4 Members" },
-    { name: "elw0n", type: "dm" },
-    { name: "danielahc...", type: "dm" },
+    { name: "User 2...", type: "dm" },
+    { name: "User 3, User 4, G...", type: "dm", members: "4 Members" },
+    { name: "User 5", type: "dm" },
+    { name: "User 6...", type: "dm" },
     { name: "Midjourney Bot", type: "dm", active: true },
   ];
+
+  const textChannels = [
+    { name: "general", type: "text" },
+    { name: "newbies", type: "text" },
+    { name: "🎨-showcase", type: "text" },
+    { name: "prompt-help", type: "text" },
+    { name: "🚨-rules", type: "text" },
+  ];
+
+  const voiceChannels = [
+    { name: "General", type: "voice", users: 0 },
+    { name: "🎨 Creative Session", type: "voice", users: 3 },
+    { name: "Help Desk", type: "voice", users: 1 },
+  ];
+
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupName) 
+        ? prev.filter(g => g !== groupName)
+        : [...prev, groupName]
+    );
+  };
 
   return (
     <div className="flex h-screen bg-gray-800">
@@ -47,12 +72,79 @@ const DiscordSidebar = () => {
       {/* Channel List */}
       <div className="w-60 bg-gray-800 flex flex-col">
         <div className="h-12 border-b border-gray-700 flex items-center px-4">
-          <span className="text-white font-semibold">Direct Messages</span>
+          <span className="text-white font-semibold">Midjourney Official</span>
         </div>
         
         <div className="flex-1 overflow-y-auto">
+          {/* Text Channels */}
           <div className="p-2">
-            {channels.map((channel, index) => (
+            <div 
+              className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+              onClick={() => toggleGroup("text")}
+            >
+              {expandedGroups.includes("text") ? (
+                <ChevronDown className="w-3 h-3 mr-1" />
+              ) : (
+                <ChevronRight className="w-3 h-3 mr-1" />
+              )}
+              Text Channels
+            </div>
+            
+            {expandedGroups.includes("text") && (
+              <div className="ml-2">
+                {textChannels.map((channel, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
+                  >
+                    <Hash className="w-4 h-4 text-gray-400 mr-2" />
+                    <span className="text-gray-300 text-sm">{channel.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Voice Channels */}
+          <div className="p-2">
+            <div 
+              className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+              onClick={() => toggleGroup("voice")}
+            >
+              {expandedGroups.includes("voice") ? (
+                <ChevronDown className="w-3 h-3 mr-1" />
+              ) : (
+                <ChevronRight className="w-3 h-3 mr-1" />
+              )}
+              Voice Channels
+            </div>
+            
+            {expandedGroups.includes("voice") && (
+              <div className="ml-2">
+                {voiceChannels.map((channel, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
+                  >
+                    <Volume2 className="w-4 h-4 text-gray-400 mr-2" />
+                    <span className="text-gray-300 text-sm flex-1">{channel.name}</span>
+                    {channel.users > 0 && (
+                      <span className="text-gray-500 text-xs">{channel.users}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Direct Messages */}
+          <div className="p-2 border-t border-gray-700 mt-2">
+            <div className="flex items-center justify-between px-2 py-1 text-gray-400 text-xs uppercase font-semibold">
+              Direct Messages
+              <span className="text-lg cursor-pointer hover:text-white">+</span>
+            </div>
+            
+            {dmChannels.map((channel, index) => (
               <div
                 key={index}
                 className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
@@ -83,10 +175,10 @@ const DiscordSidebar = () => {
         {/* User Panel */}
         <div className="h-14 bg-gray-900 flex items-center px-2">
           <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center mr-2">
-            <span className="text-white text-sm font-bold">D</span>
+            <span className="text-white text-sm font-bold">U</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white text-sm font-medium">Dancp</div>
+            <div className="text-white text-sm font-medium">User</div>
             <div className="text-gray-400 text-xs">#1234</div>
           </div>
           <div className="flex space-x-1">
