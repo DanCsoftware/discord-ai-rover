@@ -1,3 +1,4 @@
+
 export interface Message {
   id: number;
   user: string;
@@ -319,7 +320,7 @@ const musicChannels: Channel[] = [
   }
 ];
 
-// Midjourney Server (Server 4) - keep existing channels but update some content
+// Midjourney Server (Server 4) - Updated with more specific content per channel
 const midjourneyChannels: Channel[] = [
   {
     id: 'general',
@@ -374,7 +375,7 @@ const midjourneyChannels: Channel[] = [
         id: 1,
         user: 'Admin',
         time: '8:15 PM',
-        content: 'Welcome to #🔗-official-links!\n\nThis is the start of the #🔗-official-links channel.',
+        content: 'Welcome to #🔗-official-links!\n\nThis channel contains all verified official links and resources for our community.',
         isBot: true,
         isWelcome: true
       },
@@ -382,21 +383,41 @@ const midjourneyChannels: Channel[] = [
         id: 2,
         user: 'ProjectBot',
         time: '8:16 PM',
-        content: 'Those are the only official links for our project, do not interact with others.',
+        content: '⚠️ **SECURITY NOTICE**\n\nThese are the ONLY official links for our project. Do not interact with any other links claiming to be official.',
         isBot: true,
         hasReactions: true,
-        reactions: [{ emoji: '📌', count: 45 }]
+        reactions: [{ emoji: '⚠️', count: 89 }, { emoji: '📌', count: 145 }]
       },
       {
         id: 3,
         user: 'ProjectBot',
         time: '8:17 PM',
-        content: 'Official Resources:\n\n🌐 Website: https://ourproject.com\n📚 Documentation: https://docs.ourproject.com\n💻 GitHub: https://github.com/ourproject\n📱 Mobile App: https://app.ourproject.com\n🔗 Secondary: https://backup.ourproject.com',
+        content: '🔗 **OFFICIAL RESOURCES**\n\n🌐 Main Website: https://midjourney.com\n📚 Documentation: https://docs.midjourney.com\n💻 GitHub Repository: https://github.com/midjourney/community\n📱 Mobile App: https://app.midjourney.com\n🔗 Status Page: https://status.midjourney.com\n💬 Support Portal: https://support.midjourney.com',
         isBot: true,
         hasLinks: true,
-        links: ['https://ourproject.com', 'https://docs.ourproject.com', 'https://github.com/ourproject'],
+        links: ['https://midjourney.com', 'https://docs.midjourney.com', 'https://github.com/midjourney/community', 'https://app.midjourney.com', 'https://status.midjourney.com', 'https://support.midjourney.com'],
         hasReactions: true,
-        reactions: [{ emoji: '🔗', count: 89 }, { emoji: '📌', count: 156 }, { emoji: '✅', count: 234 }]
+        reactions: [{ emoji: '🔗', count: 234 }, { emoji: '📌', count: 189 }, { emoji: '✅', count: 345 }]
+      },
+      {
+        id: 4,
+        user: 'SecurityBot',
+        time: '8:20 PM',
+        content: '🛡️ **PHISHING PROTECTION**\n\nAlways verify URLs before clicking! Official domains:\n• midjourney.com\n• docs.midjourney.com\n• app.midjourney.com\n\nReport suspicious links to moderators immediately!',
+        isBot: true,
+        hasReactions: true,
+        reactions: [{ emoji: '🛡️', count: 67 }, { emoji: '✅', count: 123 }]
+      },
+      {
+        id: 5,
+        user: 'Admin',
+        time: '8:25 PM',
+        content: '📋 **QUICK ACCESS LINKS**\n\n🎯 Prompt Guide: https://docs.midjourney.com/prompts\n🎨 Gallery: https://midjourney.com/gallery\n💡 Tips & Tricks: https://docs.midjourney.com/tips\n🔧 Settings: https://docs.midjourney.com/settings',
+        isBot: true,
+        hasLinks: true,
+        links: ['https://docs.midjourney.com/prompts', 'https://midjourney.com/gallery', 'https://docs.midjourney.com/tips', 'https://docs.midjourney.com/settings'],
+        hasReactions: true,
+        reactions: [{ emoji: '📋', count: 156 }, { emoji: '🎯', count: 89 }]
       }
     ]
   },
@@ -481,6 +502,24 @@ const midjourneyChannels: Channel[] = [
         isBot: false,
         hasReactions: true,
         reactions: [{ emoji: '💡', count: 23 }]
+      },
+      {
+        id: 5,
+        user: 'DigitalArtist',
+        time: '1:30 PM',
+        content: 'Here\'s my latest portrait work! 🖼️\n\n"elderly wizard with wise eyes, long white beard, magical aura, renaissance painting style, chiaroscuro lighting, oil painting texture"\n\nThe detail in the eyes came out perfect!',
+        isBot: false,
+        hasReactions: true,
+        reactions: [{ emoji: '🖼️', count: 156 }, { emoji: '🧙‍♂️', count: 89 }, { emoji: '👁️', count: 67 }]
+      },
+      {
+        id: 6,
+        user: 'AbstractArtist',
+        time: '2:45 PM',
+        content: 'Abstract experiment today! 🎭\n\n"geometric shapes melting into organic forms, vibrant colors, surreal, salvador dali meets mondrian"\n\nAI art is pushing the boundaries of creativity!',
+        isBot: false,
+        hasReactions: true,
+        reactions: [{ emoji: '🎭', count: 45 }, { emoji: '🌈', count: 67 }]
       }
     ]
   },
@@ -495,7 +534,7 @@ const midjourneyChannels: Channel[] = [
         id: 1,
         user: 'Admin',
         time: '12:00 PM',
-        content: 'Welcome to #🚨-rules!\n\nPlease read and follow all community guidelines.',
+        content: 'Welcome to #🚨-rules!\n\nPlease read and follow all community guidelines to maintain a positive environment for everyone.',
         isBot: true,
         isWelcome: true
       },
@@ -506,7 +545,25 @@ const midjourneyChannels: Channel[] = [
         content: '📋 **COMMUNITY RULES**\n\n1. **Be Respectful** - Treat everyone with kindness and respect\n2. **No Spam** - Keep conversations meaningful and on-topic\n3. **No NSFW Content** - Keep all content appropriate for all ages\n4. **Use Appropriate Channels** - Post in the right channels for your content\n5. **No Self-Promotion** - Don\'t advertise without permission\n6. **Help Others** - Be supportive of fellow community members\n7. **Follow Discord ToS** - All Discord Terms of Service apply\n\nViolation of these rules may result in warnings, mutes, or bans.',
         isBot: true,
         hasReactions: true,
-        reactions: [{ emoji: '📌', count: 156 }, { emoji: '✅', count: 89 }, { emoji: '👍', count: 234 }]
+        reactions: [{ emoji: '📌', count: 456 }, { emoji: '✅', count: 289 }, { emoji: '👍', count: 334 }]
+      },
+      {
+        id: 3,
+        user: 'ModeratorAlpha',
+        time: '12:05 PM',
+        content: '⚖️ **MODERATION POLICY**\n\n• First violation: Warning\n• Second violation: Temporary mute (24h)\n• Third violation: Temporary ban (7 days)\n• Serious violations: Immediate permanent ban\n\nWe aim to be fair but firm. Questions? DM any moderator.',
+        isBot: false,
+        hasReactions: true,
+        reactions: [{ emoji: '⚖️', count: 123 }, { emoji: '📝', count: 89 }]
+      },
+      {
+        id: 4,
+        user: 'Admin',
+        time: '12:10 PM',
+        content: '🎨 **AI ART SPECIFIC RULES**\n\n• No generating explicit or harmful content\n• Credit original artists when using their style\n• Don\'t claim AI art as hand-drawn\n• Share prompts when asked (help others learn!)\n• Respect copyright and intellectual property',
+        isBot: true,
+        hasReactions: true,
+        reactions: [{ emoji: '🎨', count: 234 }, { emoji: '📋', count: 167 }]
       }
     ]
   },
@@ -521,7 +578,7 @@ const midjourneyChannels: Channel[] = [
         id: 1,
         user: 'Admin',
         time: '9:00 AM',
-        content: 'Welcome to #📢-announcements! Stay updated with the latest news and updates.',
+        content: 'Welcome to #📢-announcements! Stay updated with the latest news and important updates.',
         isBot: true,
         isWelcome: true
       },
@@ -532,7 +589,34 @@ const midjourneyChannels: Channel[] = [
         content: '🎉 **MIDJOURNEY V6 IS NOW LIVE!**\n\nMajor improvements include:\n\n• Enhanced prompt understanding\n• Better coherence in complex scenes\n• Improved text rendering\n• Higher resolution outputs\n• More realistic lighting\n\nTry it now with --v 6 in your prompts!',
         isBot: true,
         hasReactions: true,
-        reactions: [{ emoji: '🎉', count: 234 }, { emoji: '🔥', count: 189 }, { emoji: '🚀', count: 156 }]
+        reactions: [{ emoji: '🎉', count: 1234 }, { emoji: '🔥', count: 789 }, { emoji: '🚀', count: 567 }]
+      },
+      {
+        id: 3,
+        user: 'TechTeam',
+        time: '4:15 PM',
+        content: '🔧 **SCHEDULED MAINTENANCE**\n\nWe\'ll be performing server maintenance tomorrow (Dec 1st) from 2-4 AM EST.\n\nExpected improvements:\n• Faster image generation\n• Reduced queue times\n• Bug fixes for prompt parsing\n\nThank you for your patience!',
+        isBot: false,
+        hasReactions: true,
+        reactions: [{ emoji: '🔧', count: 345 }, { emoji: '⏰', count: 234 }, { emoji: '👍', count: 456 }]
+      },
+      {
+        id: 4,
+        user: 'CommunityManager',
+        time: '6:45 PM',
+        content: '🏆 **MONTHLY ART CONTEST WINNERS!**\n\nCongratulations to our November winners:\n\n🥇 1st Place: @CreativeGenius - "Cyberpunk Cityscape"\n🥈 2nd Place: @DigitalArtist - "Mystical Forest"\n🥉 3rd Place: @AbstractArtist - "Geometric Dreams"\n\nDecember contest theme: "Winter Wonderland" ❄️\nSubmissions open now in #showcase!',
+        isBot: false,
+        hasReactions: true,
+        reactions: [{ emoji: '🏆', count: 567 }, { emoji: '🎨', count: 423 }, { emoji: '❄️', count: 234 }]
+      },
+      {
+        id: 5,
+        user: 'Admin',
+        time: '8:00 PM',
+        content: '📊 **COMMUNITY MILESTONE!**\n\nWe\'ve reached 100,000 members! 🎊\n\nTo celebrate, we\'re offering:\n• 2x generation speed this weekend\n• Exclusive beta access to V7 features\n• Special community badges for active members\n\nThank you for making this community amazing!',
+        isBot: true,
+        hasReactions: true,
+        reactions: [{ emoji: '🎊', count: 2345 }, { emoji: '💯', count: 1000 }, { emoji: '🚀', count: 876 }]
       }
     ]
   }
@@ -713,3 +797,4 @@ export const dmMessages: Record<string, Message[]> = {
     }
   ]
 };
+
