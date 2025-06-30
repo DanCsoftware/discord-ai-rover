@@ -2,7 +2,14 @@
 import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-const DiscordSidebar = () => {
+interface DiscordSidebarProps {
+  onChannelClick: (channelId: string) => void;
+  onDMClick: (userId: string) => void;
+  activeChannel: string;
+  activeChannelType: 'text' | 'dm';
+}
+
+const DiscordSidebar = ({ onChannelClick, onDMClick, activeChannel, activeChannelType }: DiscordSidebarProps) => {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["text", "voice"]);
   
   const servers = [
@@ -13,22 +20,22 @@ const DiscordSidebar = () => {
   ];
 
   const dmChannels = [
-    { name: "Find or start a conve...", type: "dm" },
-    { name: "User 1 🔴MSU", type: "dm", status: "online" },
-    { name: "Tickets", type: "dm" },
-    { name: "User 2...", type: "dm" },
-    { name: "User 3, User 4, G...", type: "dm", members: "4 Members" },
-    { name: "User 5", type: "dm" },
-    { name: "User 6...", type: "dm" },
-    { name: "Midjourney Bot", type: "dm", active: true },
+    { id: "search", name: "Find or start a conve...", type: "dm" },
+    { id: "user1", name: "User1 🔴MSU", type: "dm", status: "online" },
+    { id: "tickets", name: "Tickets", type: "dm" },
+    { id: "user2", name: "User2...", type: "dm" },
+    { id: "group1", name: "User3, User4, G...", type: "dm", members: "4 Members" },
+    { id: "user5", name: "User5", type: "dm" },
+    { id: "user6", name: "User6...", type: "dm" },
+    { id: "midjourney-bot", name: "Midjourney Bot", type: "dm" },
   ];
 
   const textChannels = [
-    { name: "general", type: "text" },
-    { name: "newbies", type: "text" },
-    { name: "🎨-showcase", type: "text" },
-    { name: "prompt-help", type: "text" },
-    { name: "🚨-rules", type: "text" },
+    { id: "general", name: "general", type: "text" },
+    { id: "newbies", name: "newbies", type: "text" },
+    { id: "showcase", name: "🎨-showcase", type: "text" },
+    { id: "prompt-help", name: "prompt-help", type: "text" },
+    { id: "rules", name: "🚨-rules", type: "text" },
   ];
 
   const voiceChannels = [
@@ -43,6 +50,10 @@ const DiscordSidebar = () => {
         ? prev.filter(g => g !== groupName)
         : [...prev, groupName]
     );
+  };
+
+  const isChannelActive = (channelId: string, channelType: 'text' | 'dm') => {
+    return activeChannel === channelId && activeChannelType === channelType;
   };
 
   return (
@@ -92,10 +103,13 @@ const DiscordSidebar = () => {
             
             {expandedGroups.includes("text") && (
               <div className="ml-2">
-                {textChannels.map((channel, index) => (
+                {textChannels.map((channel) => (
                   <div
-                    key={index}
-                    className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
+                    key={channel.id}
+                    className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
+                      isChannelActive(channel.id, 'text') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                    }`}
+                    onClick={() => onChannelClick(channel.id)}
                   >
                     <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                     <span className="text-gray-300 text-sm truncate">{channel.name}</span>
@@ -144,12 +158,13 @@ const DiscordSidebar = () => {
               <span className="text-lg cursor-pointer hover:text-white flex-shrink-0">+</span>
             </div>
             
-            {dmChannels.map((channel, index) => (
+            {dmChannels.map((channel) => (
               <div
-                key={index}
+                key={channel.id}
                 className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
-                  channel.active ? "bg-gray-700" : "hover:bg-gray-700"
+                  isChannelActive(channel.id, 'dm') ? "bg-gray-700" : "hover:bg-gray-700"
                 }`}
+                onClick={() => channel.id !== "search" && channel.id !== "tickets" && channel.id !== "group1" && onDMClick(channel.id)}
               >
                 <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center mr-3 flex-shrink-0">
                   {channel.name === "Midjourney Bot" ? (
