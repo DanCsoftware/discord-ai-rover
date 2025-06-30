@@ -1,11 +1,17 @@
-
 import { useState } from 'react';
 import { channels, dmUsers, dmMessages, Channel, User, Message } from '@/data/discordData';
 
 export const useDiscordState = () => {
-  const [activeChannel, setActiveChannel] = useState<string>('midjourney-bot');
-  const [activeChannelType, setActiveChannelType] = useState<'text' | 'dm'>('dm');
-  const [activeUser, setActiveUser] = useState<User>(dmUsers.find(u => u.id === 'midjourney-bot')!);
+  const [activeChannel, setActiveChannel] = useState<string>('official-links');
+  const [activeChannelType, setActiveChannelType] = useState<'text' | 'dm'>('text');
+  const [activeUser, setActiveUser] = useState<User>({
+    id: 'server',
+    name: 'Midjourney Official',
+    username: '',
+    avatar: '/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png',
+    aboutMe: 'Official Midjourney Discord Server',
+    createdOn: 'Jan 29, 2022'
+  });
 
   const switchToChannel = (channelId: string) => {
     const channel = channels.find(c => c.id === channelId);

@@ -1,4 +1,3 @@
-
 import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
@@ -31,11 +30,12 @@ const DiscordSidebar = ({ onChannelClick, onDMClick, activeChannel, activeChanne
   ];
 
   const textChannels = [
+    { id: "rules", name: "🚨-rules", type: "text" },
+    { id: "announcements", name: "📢-announcements", type: "text" },
     { id: "general", name: "general", type: "text" },
     { id: "newbies", name: "newbies", type: "text" },
+    { id: "official-links", name: "🔗-official-links", type: "text" },
     { id: "showcase", name: "🎨-showcase", type: "text" },
-    { id: "prompt-help", name: "prompt-help", type: "text" },
-    { id: "rules", name: "🚨-rules", type: "text" },
   ];
 
   const voiceChannels = [

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Send, Plus, Gift, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,39 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
     </div>;
   };
 
+  const renderMessageContent = (msg: Message) => {
+    let content = msg.content;
+    
+    // Handle links in content
+    if (msg.hasLinks && msg.links) {
+      msg.links.forEach(link => {
+        content = content.replace(link, `<a href="${link}" class="text-blue-400 hover:underline" target="_blank">${link}</a>`);
+      });
+    }
+    
+    return (
+      <div 
+        className={`text-gray-300 text-sm leading-relaxed ${msg.isWelcome ? 'text-lg font-medium text-white' : ''}`}
+        dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br/>') }}
+      />
+    );
+  };
+
+  const renderReactions = (reactions?: { emoji: string; count: number }[]) => {
+    if (!reactions || reactions.length === 0) return null;
+    
+    return (
+      <div className="flex flex-wrap gap-1 mt-2">
+        {reactions.map((reaction, index) => (
+          <div key={index} className="bg-gray-800 hover:bg-gray-700 cursor-pointer rounded px-2 py-1 flex items-center space-x-1">
+            <span className="text-sm">{reaction.emoji}</span>
+            <span className="text-xs text-gray-400">{reaction.count}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-gray-700">
       {/* Chat Header */}
@@ -38,6 +70,11 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
           {getChannelIcon()}
         </div>
         <span className="text-white font-semibold">{channelName}</span>
+        {channelType === 'text' && (
+          <span className="text-gray-400 text-sm ml-2">
+            {messages.find(m => m.isWelcome)?.content?.split('\n')[0]?.replace('Welcome to ', '').replace('!', '') || ''}
+          </span>
+        )}
       </div>
 
       {/* Messages */}
@@ -90,7 +127,8 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
                 {msg.isBot && <span className="bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded">BOT</span>}
                 {msg.time && <span className="text-gray-500 text-xs">{msg.time}</span>}
               </div>
-              <div className="text-gray-300 text-sm leading-relaxed">{msg.content}</div>
+              
+              {renderMessageContent(msg)}
               
               {msg.hasButton && (
                 <Button className="mt-2 bg-green-600 hover:bg-green-700 text-white" size="sm">
@@ -127,6 +165,8 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
                   </div>
                 </div>
               )}
+
+              {renderReactions(msg.hasReactions ? msg.reactions : undefined)}
             </div>
           </div>
         ))}
