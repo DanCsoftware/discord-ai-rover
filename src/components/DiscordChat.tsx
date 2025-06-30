@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+
+import { useState, useMemo, useEffect } from "react";
 import { Send, Plus, Gift, Smile, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/data/discordData";
@@ -21,7 +22,7 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   const [showUserList, setShowUserList] = useState(true);
 
   // Update chatMessages when messages prop changes (channel switching)
-  useState(() => {
+  useEffect(() => {
     setChatMessages(messages);
   }, [messages]);
 
