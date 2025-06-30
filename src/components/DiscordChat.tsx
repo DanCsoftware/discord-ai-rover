@@ -5,7 +5,7 @@ import { Message } from "@/data/discordData";
 import { AIAssistant } from "./AIAssistant";
 import DiscordChannelHeader from "./DiscordChannelHeader";
 import DiscordUserList from "./DiscordUserList";
-import { extractLinksFromText, generateSafetyReport, LinkSafetyReport } from "@/utils/linkSafetyAnalyzer";
+import { extractLinksFromText, generateSafetyReport, LinkSafetyReport, generateSmartLinkResponse } from "@/utils/linkSafetyAnalyzer";
 
 interface DiscordChatProps {
   channelName: string;
@@ -130,6 +130,17 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
     return keywords.some(keyword => lowerMessage.includes(keyword));
   };
 
+  const isSmartLinkQuery = (userMessage: string): boolean => {
+    const lowerMessage = userMessage.toLowerCase();
+    const smartKeywords = [
+      'which link', 'what link', 'where to', 'how to', 'register', 'signup', 
+      'learn', 'tutorial', 'guide', 'product', 'features', 'about', 
+      'support', 'help', 'pricing', 'cost', 'download', 'install', 
+      'community', 'forum', 'go to', 'visit', 'click'
+    ];
+    return smartKeywords.some(keyword => lowerMessage.includes(keyword));
+  };
+
   const generateLinkSafetyResponse = (report: LinkSafetyReport): string => {
     if (report.totalLinks === 0) {
       return "I didn't find any links in the recent messages to analyze. If you're seeing links, try asking me again or mention the specific links you'd like me to check.";
@@ -239,17 +250,20 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
       const cleanMessage = userMessage.replace('@rover', '').trim().toLowerCase();
       let response = "I'm ROVER, your AI assistant! I'm here to help you with various tasks.";
       
-      // Check if this is a link safety query
-      if (isLinkSafetyQuery(cleanMessage)) {
+      // Check if this is a smart link query (prioritize over safety)
+      if (isSmartLinkQuery(cleanMessage)) {
+        const foundLinks = scanRecentMessagesForLinks();
+        response = generateSmartLinkResponse(cleanMessage, foundLinks);
+      } else if (isLinkSafetyQuery(cleanMessage)) {
         const foundLinks = scanRecentMessagesForLinks();
         const safetyReport = generateSafetyReport(foundLinks);
         response = generateLinkSafetyResponse(safetyReport);
       } else if (cleanMessage.includes('help')) {
-        response = "Here are some things I can help you with:\n• Answer questions\n• Check link safety (just ask 'are these links safe?')\n• Provide information\n• Assist with creative tasks\n• And much more!";
+        response = "Here are some things I can help you with:\n• Answer questions about links ('which link should I use to register?')\n• Check link safety ('are these links safe?')\n• Provide information and recommendations\n• Assist with creative tasks\n• And much more!";
       } else if (cleanMessage.includes('hello') || cleanMessage.includes('hi')) {
-        response = "Hello there! How can I assist you today? I can help check link safety, answer questions, and more!";
+        response = "Hello there! How can I assist you today? I can help you find the right links, check link safety, answer questions, and more!";
       } else if (cleanMessage.includes('what') || cleanMessage.includes('how')) {
-        response = "That's a great question! Let me help you with that. Feel free to be more specific about what you'd like to know.";
+        response = "That's a great question! Let me help you with that. Feel free to be more specific about what you'd like to know. I can analyze links and provide smart recommendations!";
       }
 
       const aiMessage: Message = {
