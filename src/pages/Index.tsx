@@ -22,7 +22,7 @@ const Index = () => {
 
   return (
     <div className="h-screen bg-gray-900 flex overflow-hidden">
-      <ResizablePanelGroup direction="horizontal" className="w-full">
+      <ResizablePanelGroup direction="horizontal" className="w-full group">
         <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
           <DiscordSidebar 
             onChannelClick={switchToChannel}
@@ -36,7 +36,10 @@ const Index = () => {
           />
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle 
+          withHandle 
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:opacity-100" 
+        />
         
         <ResizablePanel defaultSize={60} minSize={40}>
           <DiscordChat 
@@ -47,7 +50,10 @@ const Index = () => {
           />
         </ResizablePanel>
         
-        <ResizableHandle withHandle className="hidden lg:flex" />
+        <ResizableHandle 
+          withHandle 
+          className="hidden lg:flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:opacity-100" 
+        />
         
         {/* Show user panel only for DMs, show user list for text channels (handled in DiscordChat) */}
         {activeChannelType === 'dm' && (
