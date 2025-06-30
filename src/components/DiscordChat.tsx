@@ -20,6 +20,11 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [showUserList, setShowUserList] = useState(true);
 
+  // Update chatMessages when messages prop changes (channel switching)
+  useState(() => {
+    setChatMessages(messages);
+  }, [messages]);
+
   // Extract users from messages and create user list with roles and status
   const channelUsers = useMemo(() => {
     const userMap = new Map();
@@ -106,7 +111,8 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   };
 
   const scanRecentMessagesForLinks = (): string[] => {
-    const recentMessages = chatMessages.slice(-15); // Last 15 messages
+    // Use the current channel's messages instead of chatMessages state
+    const recentMessages = messages.slice(-15); // Last 15 messages from the actual channel
     const allLinks: string[] = [];
 
     recentMessages.forEach(msg => {
