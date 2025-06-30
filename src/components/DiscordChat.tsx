@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Send, Plus, Gift, Smile } from "lucide-react";
+import { Send, Plus, Gift, Smile, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/data/discordData";
 import { AIAssistant } from "./AIAssistant";
@@ -90,10 +90,17 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   }, [messages, chatMessages]);
 
   const getMessageAvatar = (msgUser: string, isBot?: boolean) => {
-    if (msgUser === 'Midjourney Bot' || isBot) {
-      return <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Bot" className="w-6 h-6 rounded-full" />;
+    if (msgUser === 'ROVER') {
+      return (
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 flex items-center justify-center shadow-lg">
+          <Sparkles className="w-4 h-4 text-white" />
+        </div>
+      );
     }
-    return <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+    if (msgUser === 'Midjourney Bot' || isBot) {
+      return <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Bot" className="w-8 h-8 rounded-full" />;
+    }
+    return <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">
       {msgUser.charAt(0)}
     </div>;
   };
@@ -164,6 +171,18 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
       msg.links.forEach(link => {
         content = content.replace(link, `<a href="${link}" class="text-blue-400 hover:underline" target="_blank">${link}</a>`);
       });
+    }
+    
+    // Special styling for ROVER messages
+    if (msg.user === 'ROVER') {
+      return (
+        <div className="bg-gradient-to-r from-blue-50/10 to-purple-50/10 border border-blue-500/20 rounded-lg p-4 mt-2">
+          <div 
+            className="text-gray-200 text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br/>') }}
+          />
+        </div>
+      );
     }
     
     return (
@@ -306,25 +325,25 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
 
             {/* Messages */}
             {chatMessages.map((msg) => (
-              <div key={msg.id} className="flex items-start space-x-3">
-                <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
-                  {msg.user === 'ROVER' ? (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">R</span>
-                    </div>
-                  ) : msg.user === 'Midjourney Bot' || msg.isBot ? (
-                    <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Bot" className="w-6 h-6 rounded-full" />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-                      {msg.user.charAt(0)}
-                    </div>
-                  )}
+              <div key={msg.id} className={`flex items-start space-x-3 ${msg.user === 'ROVER' ? 'relative' : ''}`}>
+                {msg.user === 'ROVER' && (
+                  <div className="absolute -left-2 top-0 w-1 h-full bg-gradient-to-b from-blue-500 to-purple-600 rounded-full opacity-60"></div>
+                )}
+                <div className="flex-shrink-0">
+                  {getMessageAvatar(msg.user, msg.isBot)}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-white font-medium">{msg.user}</span>
+                    <span className={`font-medium ${msg.user === 'ROVER' ? 'text-blue-300' : 'text-white'}`}>
+                      {msg.user}
+                    </span>
                     {msg.user === 'ROVER' && (
-                      <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs px-1.5 py-0.5 rounded">AI</span>
+                      <div className="flex items-center space-x-1">
+                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+                          AI Assistant
+                        </div>
+                        <Sparkles className="w-3 h-3 text-blue-400 animate-pulse" />
+                      </div>
                     )}
                     {msg.isBot && msg.user !== 'ROVER' && (
                       <span className="bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded">BOT</span>
