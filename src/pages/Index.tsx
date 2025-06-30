@@ -10,8 +10,10 @@ const Index = () => {
     activeChannel,
     activeChannelType, 
     activeUser,
+    isDMView,
     switchToChannel,
     switchToDM,
+    switchToDMView,
     getCurrentMessages,
     getCurrentChannelName
   } = useDiscordState();
@@ -23,8 +25,10 @@ const Index = () => {
           <DiscordSidebar 
             onChannelClick={switchToChannel}
             onDMClick={switchToDM}
+            onDMViewClick={switchToDMView}
             activeChannel={activeChannel}
             activeChannelType={activeChannelType}
+            isDMView={isDMView}
           />
         </ResizablePanel>
         
@@ -41,9 +45,12 @@ const Index = () => {
         
         <ResizableHandle withHandle className="hidden lg:flex" />
         
-        <ResizablePanel defaultSize={20} minSize={0} maxSize={25} className="hidden lg:block">
-          <DiscordUserPanel activeUser={activeUser} />
-        </ResizablePanel>
+        {/* Show user panel only for DMs, show user list for text channels (handled in DiscordChat) */}
+        {activeChannelType === 'dm' && (
+          <ResizablePanel defaultSize={20} minSize={0} maxSize={25} className="hidden lg:block">
+            <DiscordUserPanel activeUser={activeUser} />
+          </ResizablePanel>
+        )}
       </ResizablePanelGroup>
     </div>
   );

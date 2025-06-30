@@ -1,21 +1,23 @@
+
 import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 interface DiscordSidebarProps {
   onChannelClick: (channelId: string) => void;
   onDMClick: (userId: string) => void;
+  onDMViewClick: () => void;
   activeChannel: string;
   activeChannelType: 'text' | 'dm';
+  isDMView: boolean;
 }
 
-const DiscordSidebar = ({ onChannelClick, onDMClick, activeChannel, activeChannelType }: DiscordSidebarProps) => {
+const DiscordSidebar = ({ onChannelClick, onDMClick, onDMViewClick, activeChannel, activeChannelType, isDMView }: DiscordSidebarProps) => {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["text", "voice"]);
   
   const servers = [
-    { id: 1, name: "Discord", icon: "🎮", active: false },
     { id: 2, name: "Server 1", icon: "🔥", active: false },
     { id: 3, name: "Server 2", icon: "🎵", active: false },
-    { id: 4, name: "Midjourney", icon: "/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png", active: true },
+    { id: 4, name: "Midjourney", icon: "/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png", active: !isDMView },
   ];
 
   const dmChannels = [
@@ -60,6 +62,18 @@ const DiscordSidebar = ({ onChannelClick, onDMClick, activeChannel, activeChanne
     <div className="flex h-full bg-gray-800">
       {/* Server List */}
       <div className="w-16 bg-gray-900 flex flex-col items-center py-3 space-y-2 flex-shrink-0">
+        {/* Discord Icon for Direct Messages */}
+        <div
+          onClick={onDMViewClick}
+          className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all ${
+            isDMView ? "bg-indigo-600" : "bg-gray-700 hover:bg-indigo-600 hover:rounded-xl"
+          }`}
+        >
+          <span className="text-xl">🎮</span>
+        </div>
+        
+        <div className="w-8 h-0.5 bg-gray-600 rounded-full"></div>
+        
         {servers.map((server) => (
           <div
             key={server.id}
@@ -83,108 +97,115 @@ const DiscordSidebar = ({ onChannelClick, onDMClick, activeChannel, activeChanne
       {/* Channel List */}
       <div className="flex-1 bg-gray-800 flex flex-col min-w-0">
         <div className="h-12 border-b border-gray-700 flex items-center px-4 flex-shrink-0">
-          <span className="text-white font-semibold truncate">Midjourney Official</span>
+          <span className="text-white font-semibold truncate">
+            {isDMView ? "Direct Messages" : "Midjourney Official"}
+          </span>
         </div>
         
         <div className="flex-1 overflow-y-auto">
-          {/* Text Channels */}
-          <div className="p-2">
-            <div 
-              className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
-              onClick={() => toggleGroup("text")}
-            >
-              {expandedGroups.includes("text") ? (
-                <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
-              ) : (
-                <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
-              )}
-              <span className="truncate">Text Channels</span>
-            </div>
-            
-            {expandedGroups.includes("text") && (
-              <div className="ml-2">
-                {textChannels.map((channel) => (
-                  <div
-                    key={channel.id}
-                    className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
-                      isChannelActive(channel.id, 'text') ? 'bg-gray-700' : 'hover:bg-gray-700'
-                    }`}
-                    onClick={() => onChannelClick(channel.id)}
-                  >
-                    <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm truncate">{channel.name}</span>
-                  </div>
-                ))}
+          {isDMView ? (
+            /* Direct Messages View */
+            <div className="p-2">
+              <div className="flex items-center justify-between px-2 py-1 text-gray-400 text-xs uppercase font-semibold">
+                <span className="truncate">Direct Messages</span>
+                <span className="text-lg cursor-pointer hover:text-white flex-shrink-0">+</span>
               </div>
-            )}
-          </div>
-
-          {/* Voice Channels */}
-          <div className="p-2">
-            <div 
-              className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
-              onClick={() => toggleGroup("voice")}
-            >
-              {expandedGroups.includes("voice") ? (
-                <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
-              ) : (
-                <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
-              )}
-              <span className="truncate">Voice Channels</span>
-            </div>
-            
-            {expandedGroups.includes("voice") && (
-              <div className="ml-2">
-                {voiceChannels.map((channel, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
-                  >
-                    <Volume2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm flex-1 truncate">{channel.name}</span>
-                    {channel.users > 0 && (
-                      <span className="text-gray-500 text-xs flex-shrink-0">{channel.users}</span>
+              
+              {dmChannels.map((channel) => (
+                <div
+                  key={channel.id}
+                  className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
+                    isChannelActive(channel.id, 'dm') ? "bg-gray-700" : "hover:bg-gray-700"
+                  }`}
+                  onClick={() => channel.id !== "search" && channel.id !== "tickets" && channel.id !== "group1" && onDMClick(channel.id)}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center mr-3 flex-shrink-0">
+                    {channel.name === "Midjourney Bot" ? (
+                      <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Midjourney" className="w-6 h-6 rounded-full" />
+                    ) : (
+                      <Bot className="w-4 h-4 text-gray-300" />
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Direct Messages */}
-          <div className="p-2 border-t border-gray-700 mt-2">
-            <div className="flex items-center justify-between px-2 py-1 text-gray-400 text-xs uppercase font-semibold">
-              <span className="truncate">Direct Messages</span>
-              <span className="text-lg cursor-pointer hover:text-white flex-shrink-0">+</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-gray-300 text-sm truncate">{channel.name}</div>
+                    {channel.members && (
+                      <div className="text-gray-500 text-xs truncate">{channel.members}</div>
+                    )}
+                  </div>
+                  {channel.status === "online" && (
+                    <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                  )}
+                </div>
+              ))}
             </div>
-            
-            {dmChannels.map((channel) => (
-              <div
-                key={channel.id}
-                className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
-                  isChannelActive(channel.id, 'dm') ? "bg-gray-700" : "hover:bg-gray-700"
-                }`}
-                onClick={() => channel.id !== "search" && channel.id !== "tickets" && channel.id !== "group1" && onDMClick(channel.id)}
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center mr-3 flex-shrink-0">
-                  {channel.name === "Midjourney Bot" ? (
-                    <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Midjourney" className="w-6 h-6 rounded-full" />
+          ) : (
+            /* Server Channels View */
+            <>
+              {/* Text Channels */}
+              <div className="p-2">
+                <div 
+                  className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+                  onClick={() => toggleGroup("text")}
+                >
+                  {expandedGroups.includes("text") ? (
+                    <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
                   ) : (
-                    <Bot className="w-4 h-4 text-gray-300" />
+                    <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
                   )}
+                  <span className="truncate">Text Channels</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-gray-300 text-sm truncate">{channel.name}</div>
-                  {channel.members && (
-                    <div className="text-gray-500 text-xs truncate">{channel.members}</div>
-                  )}
-                </div>
-                {channel.status === "online" && (
-                  <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                
+                {expandedGroups.includes("text") && (
+                  <div className="ml-2">
+                    {textChannels.map((channel) => (
+                      <div
+                        key={channel.id}
+                        className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
+                          isChannelActive(channel.id, 'text') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                        }`}
+                        onClick={() => onChannelClick(channel.id)}
+                      >
+                        <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                        <span className="text-gray-300 text-sm truncate">{channel.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
+
+              {/* Voice Channels */}
+              <div className="p-2">
+                <div 
+                  className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+                  onClick={() => toggleGroup("voice")}
+                >
+                  {expandedGroups.includes("voice") ? (
+                    <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
+                  )}
+                  <span className="truncate">Voice Channels</span>
+                </div>
+                
+                {expandedGroups.includes("voice") && (
+                  <div className="ml-2">
+                    {voiceChannels.map((channel, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
+                      >
+                        <Volume2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                        <span className="text-gray-300 text-sm flex-1 truncate">{channel.name}</span>
+                        {channel.users > 0 && (
+                          <span className="text-gray-500 text-xs flex-shrink-0">{channel.users}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* User Panel */}

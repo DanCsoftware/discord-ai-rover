@@ -4,6 +4,7 @@ import { channels, dmUsers, dmMessages, Channel, User, Message } from '@/data/di
 export const useDiscordState = () => {
   const [activeChannel, setActiveChannel] = useState<string>('official-links');
   const [activeChannelType, setActiveChannelType] = useState<'text' | 'dm'>('text');
+  const [isDMView, setIsDMView] = useState<boolean>(false);
   const [activeUser, setActiveUser] = useState<User>({
     id: 'server',
     name: 'Midjourney Official',
@@ -18,6 +19,7 @@ export const useDiscordState = () => {
     if (channel) {
       setActiveChannel(channelId);
       setActiveChannelType('text');
+      setIsDMView(false);
       setActiveUser({
         id: 'server',
         name: 'Midjourney Official',
@@ -34,7 +36,21 @@ export const useDiscordState = () => {
     if (user) {
       setActiveChannel(userId);
       setActiveChannelType('dm');
+      setIsDMView(true);
       setActiveUser(user);
+    }
+  };
+
+  const switchToDMView = () => {
+    setIsDMView(true);
+    setActiveChannelType('dm');
+    // Keep current active channel if it's a DM, otherwise switch to first DM
+    if (activeChannelType !== 'dm') {
+      const firstDM = dmUsers[0];
+      if (firstDM) {
+        setActiveChannel(firstDM.id);
+        setActiveUser(firstDM);
+      }
     }
   };
 
@@ -60,8 +76,10 @@ export const useDiscordState = () => {
     activeChannel,
     activeChannelType,
     activeUser,
+    isDMView,
     switchToChannel,
     switchToDM,
+    switchToDMView,
     getCurrentMessages,
     getCurrentChannelName
   };
