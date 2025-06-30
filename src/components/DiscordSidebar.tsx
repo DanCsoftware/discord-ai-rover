@@ -1,5 +1,7 @@
+
 import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { servers } from "@/data/discordData";
 
 interface DiscordSidebarProps {
   onChannelClick: (channelId: string) => void;
@@ -24,12 +26,6 @@ const DiscordSidebar = ({
 }: DiscordSidebarProps) => {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["text", "voice"]);
   
-  const servers = [
-    { id: 2, name: "Server 1", icon: "🔥", active: false },
-    { id: 3, name: "Server 2", icon: "🎵", active: false },
-    { id: 4, name: "Midjourney", icon: "/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png", active: false },
-  ];
-
   const dmChannels = [
     { id: "search", name: "Find or start a conve...", type: "dm" },
     { id: "user1", name: "User1 🔴MSU", type: "dm", status: "online" },
@@ -39,21 +35,6 @@ const DiscordSidebar = ({
     { id: "user5", name: "User5", type: "dm" },
     { id: "user6", name: "User6...", type: "dm" },
     { id: "midjourney-bot", name: "Midjourney Bot", type: "dm" },
-  ];
-
-  const textChannels = [
-    { id: "rules", name: "🚨-rules", type: "text" },
-    { id: "announcements", name: "📢-announcements", type: "text" },
-    { id: "general", name: "general", type: "text" },
-    { id: "newbies", name: "newbies", type: "text" },
-    { id: "official-links", name: "🔗-official-links", type: "text" },
-    { id: "showcase", name: "🎨-showcase", type: "text" },
-  ];
-
-  const voiceChannels = [
-    { name: "General", type: "voice", users: 0 },
-    { name: "🎨 Creative Session", type: "voice", users: 3 },
-    { name: "Help Desk", type: "voice", users: 1 },
   ];
 
   const toggleGroup = (groupName: string) => {
@@ -70,6 +51,15 @@ const DiscordSidebar = ({
 
   const isServerActive = (serverId: number) => {
     return activeServer === serverId && !isDMView;
+  };
+
+  const getCurrentServer = () => {
+    return servers.find(s => s.id === activeServer);
+  };
+
+  const getCurrentServerName = () => {
+    const server = getCurrentServer();
+    return server ? server.name : "Unknown Server";
   };
 
   return (
@@ -124,7 +114,7 @@ const DiscordSidebar = ({
       <div className="flex-1 bg-gray-800 flex flex-col min-w-0">
         <div className="h-12 border-b border-gray-700 flex items-center px-4 flex-shrink-0">
           <span className="text-white font-semibold truncate">
-            {isDMView ? "Direct Messages" : getServerName(activeServer)}
+            {isDMView ? "Direct Messages" : getCurrentServerName()}
           </span>
         </div>
         
@@ -183,7 +173,7 @@ const DiscordSidebar = ({
                 
                 {expandedGroups.includes("text") && (
                   <div className="ml-2">
-                    {textChannels.map((channel) => (
+                    {getCurrentServer()?.textChannels.map((channel) => (
                       <div
                         key={channel.id}
                         className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
@@ -215,7 +205,7 @@ const DiscordSidebar = ({
                 
                 {expandedGroups.includes("voice") && (
                   <div className="ml-2">
-                    {voiceChannels.map((channel, index) => (
+                    {getCurrentServer()?.voiceChannels.map((channel, index) => (
                       <div
                         key={index}
                         className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700"
@@ -258,11 +248,6 @@ const DiscordSidebar = ({
       </div>
     </div>
   );
-
-  function getServerName(serverId: number): string {
-    const server = servers.find(s => s.id === serverId);
-    return server?.name || "Midjourney Official";
-  }
 };
 
 export default DiscordSidebar;
