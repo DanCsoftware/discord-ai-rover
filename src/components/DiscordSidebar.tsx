@@ -69,7 +69,11 @@ const DiscordSidebar = ({ onChannelClick, onDMClick, onDMViewClick, activeChanne
             isDMView ? "bg-indigo-600" : "bg-gray-700 hover:bg-indigo-600 hover:rounded-xl"
           }`}
         >
-          <span className="text-xl">🎮</span>
+          <img 
+            src="/lovable-uploads/8946501d-dd9e-4358-be97-8ba3df21de53.png" 
+            alt="Discord" 
+            className="w-8 h-8" 
+          />
         </div>
         
         <div className="w-8 h-0.5 bg-gray-600 rounded-full"></div>

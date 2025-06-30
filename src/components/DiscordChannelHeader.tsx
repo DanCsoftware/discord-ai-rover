@@ -54,11 +54,11 @@ const DiscordChannelHeader = ({ channelName, channelType, onToggleUserList, show
         
         <div className="flex items-center">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               placeholder="Search"
-              className="bg-gray-900 text-white text-sm rounded px-8 py-1 w-36 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="bg-gray-900 text-white text-sm rounded px-9 py-1.5 w-40 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
         </div>
