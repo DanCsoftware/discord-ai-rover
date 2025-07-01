@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Send, Plus, Gift, Smile, Sparkles } from "lucide-react";
+import { Send, Plus, Gift, Smile, Sparkles, Search, ExternalLink, MessageSquare, Server, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/data/discordData";
 import { AIAssistant } from "./AIAssistant";
@@ -14,6 +14,7 @@ import {
   parseTimeExpression,
   ConversationSummary 
 } from "@/utils/conversationAnalyzer";
+import { queryProcessor, SearchResponse, SearchResult, ThreadResult } from "@/utils/queryProcessor";
 
 interface DiscordChatProps {
   channelName: string;
@@ -27,6 +28,7 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   const [chatMessages, setChatMessages] = useState<Message[]>(messages);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [showUserList, setShowUserList] = useState(true);
+  const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
 
   // Update chatMessages when messages prop changes (channel switching)
   useEffect(() => {
@@ -118,24 +120,15 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
     </div>;
   };
 
-  const scanRecentMessagesForLinks = (): string[] => {
-    // Use the current channel's messages instead of chatMessages state
-    const recentMessages = messages.slice(-15); // Last 15 messages from the actual channel
-    const allLinks: string[] = [];
-
-    recentMessages.forEach(msg => {
-      // Extract links from message content
-      const textLinks = extractLinksFromText(msg.content);
-      allLinks.push(...textLinks);
-
-      // Add existing links from message data
-      if (msg.links) {
-        allLinks.push(...msg.links);
-      }
-    });
-
-    // Remove duplicates
-    return [...new Set(allLinks)];
+  const isSearchQuery = (userMessage: string): boolean => {
+    const lowerMessage = userMessage.toLowerCase();
+    const searchKeywords = [
+      'find', 'search', 'show', 'get', 'display', 'look for', 'where is',
+      'navigate', 'go to', 'take me to', 'switch to', 'open',
+      'threads', 'discussions', 'conversations', 'messages',
+      'servers', 'channels', 'users'
+    ];
+    return searchKeywords.some(keyword => lowerMessage.includes(keyword));
   };
 
   const isSummaryQuery = (userMessage: string): boolean => {
@@ -163,6 +156,71 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
       'community', 'forum', 'go to', 'visit', 'click'
     ];
     return smartKeywords.some(keyword => lowerMessage.includes(keyword));
+  };
+
+  const generateSearchResponse = (searchResponse: SearchResponse): string => {
+    let response = `🔍 **${searchResponse.message}**\n\n`;
+
+    if (searchResponse.results && searchResponse.results.length > 0) {
+      response += `📋 **Search Results:**\n`;
+      searchResponse.results.slice(0, 10).forEach((result, index) => {
+        const icon = result.type === 'message' ? '💬' : 
+                    result.type === 'server' ? '🗄️' : 
+                    result.type === 'channel' ? '#️⃣' : '👤';
+        
+        response += `${index + 1}. ${icon} **${result.title}**\n`;
+        response += `   ${result.content.substring(0, 100)}${result.content.length > 100 ? '...' : ''}\n`;
+        if (result.context) {
+          response += `   📍 ${result.context}\n`;
+        }
+        response += `\n`;
+      });
+    }
+
+    if (searchResponse.threads && searchResponse.threads.length > 0) {
+      response += `🧵 **Conversation Threads:**\n`;
+      searchResponse.threads.slice(0, 5).forEach((thread, index) => {
+        response += `${index + 1}. **${thread.topic}**\n`;
+        response += `   👥 ${thread.participants.join(', ')}\n`;
+        response += `   📅 ${thread.startTime} - ${thread.endTime}\n`;
+        response += `   📍 ${thread.server} > #${thread.channel}\n`;
+        response += `   💬 ${thread.messages.length} messages\n\n`;
+      });
+    }
+
+    if (searchResponse.navigationTarget) {
+      response += `🧭 **Quick Navigation:**\n`;
+      response += `Click to navigate to ${searchResponse.navigationTarget.name}\n\n`;
+    }
+
+    if (searchResponse.suggestions && searchResponse.suggestions.length > 0) {
+      response += `💡 **Suggestions:**\n`;
+      searchResponse.suggestions.forEach(suggestion => {
+        response += `• ${suggestion}\n`;
+      });
+    }
+
+    return response;
+  };
+
+  const scanRecentMessagesForLinks = (): string[] => {
+    // Use the current channel's messages instead of chatMessages state
+    const recentMessages = messages.slice(-15); // Last 15 messages from the actual channel
+    const allLinks: string[] = [];
+
+    recentMessages.forEach(msg => {
+      // Extract links from message content
+      const textLinks = extractLinksFromText(msg.content);
+      allLinks.push(...textLinks);
+
+      // Add existing links from message data
+      if (msg.links) {
+        allLinks.push(...msg.links);
+      }
+    });
+
+    // Remove duplicates
+    return [...new Set(allLinks)];
   };
 
   const generateLinkSafetyResponse = (report: LinkSafetyReport): string => {
@@ -308,14 +366,23 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
     setMessage("");
   };
 
-  const handleAIResponse = (userMessage: string) => {
+  const handleAIResponse = async (userMessage: string) => {
     // Simulate AI processing
-    setTimeout(() => {
-      const cleanMessage = userMessage.replace('@rover', '').trim().toLowerCase();
+    setTimeout(async () => {
+      const cleanMessage = userMessage.replace('@rover', '').trim();
       let response = "I'm ROVER, your AI assistant! I'm here to help you with various tasks.";
       
-      // Prioritize summary queries first
-      if (isSummaryQuery(cleanMessage)) {
+      // Prioritize search queries first
+      if (isSearchQuery(cleanMessage)) {
+        try {
+          const processedQuery = queryProcessor.processQuery(cleanMessage, activeUser.name, channelName);
+          const searchResponse = await queryProcessor.executeSearch(processedQuery, activeUser.name);
+          setSearchResults(searchResponse);
+          response = generateSearchResponse(searchResponse);
+        } catch (error) {
+          response = "I encountered an error processing your search request. Please try again with different terms.";
+        }
+      } else if (isSummaryQuery(cleanMessage)) {
         response = generateConversationSummaryResponse(userMessage);
       } else if (isSmartLinkQuery(cleanMessage)) {
         const foundLinks = scanRecentMessagesForLinks();
@@ -326,18 +393,24 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
         response = generateLinkSafetyResponse(safetyReport);
       } else if (cleanMessage.includes('help')) {
         response = `Here are some things I can help you with:
-• **Conversation Summaries:** "summarize the past 20 minutes", "recap today's discussion"
-• **User Activity:** "what did Sarah say?", "summarize Mike's activity"
-• **Topic Analysis:** "summarize discussion about project", "timeline of events"
-• **Link Safety:** "are these links safe?", "check link security"
-• **Smart Recommendations:** "which link should I use to register?"
-• **Time-based Queries:** "what happened while I was away?", "brief recap of last hour"
+• **🔍 Enhanced Search:** "find messages about Valorant from last week", "search for servers about gaming"
+• **🧵 Thread Discovery:** "find threads about React development", "show discussions about music production"
+• **🧭 Smart Navigation:** "navigate to gaming channels", "find channels for beginners"
+• **🗄️ Server Discovery:** "find gaming servers with active players", "show music servers similar to this one"
+• **📋 Conversation Summaries:** "summarize the past 20 minutes", "recap today's discussion"
+• **🔗 Link Safety:** "are these links safe?", "check link security"
+• **👤 User Activity:** "what did Sarah say?", "summarize Mike's activity"
 
-Try: "@rover summarize the past 30 minutes" or "@rover what did [username] discuss?"`;
+**Search Examples:**
+• "@rover find all discussions about Valorant from the past week"
+• "@rover show me gaming servers with active streamers"
+• "@rover navigate to the channel for music production"
+• "@rover find threads about React development across all servers"
+• "@rover search for messages from TechGuru about AI"`;
       } else if (cleanMessage.includes('hello') || cleanMessage.includes('hi')) {
-        response = "Hello there! How can I assist you today? I can help you summarize conversations, check link safety, analyze user activity, and much more!";
+        response = "Hello there! How can I assist you today? I can help you search messages, find servers, navigate channels, summarize conversations, check link safety, and much more! Try asking me to find something specific.";
       } else if (cleanMessage.includes('what') || cleanMessage.includes('how')) {
-        response = "That's a great question! I can help you with conversation summaries, user activity analysis, and link safety checks. Try asking me to summarize recent messages or analyze specific topics!";
+        response = "That's a great question! I can help you with advanced search, navigation, and analysis. Try asking me to find messages, threads, servers, or channels. I can also summarize conversations and analyze links!";
       }
 
       const aiMessage: Message = {
@@ -513,7 +586,7 @@ Try: "@rover summarize the past 30 minutes" or "@rover what did [username] discu
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={`Message ${channelType === 'text' ? '#' + channelName : '@' + channelName} (try @rover summarize the past 20 minutes)`}
+              placeholder={`Message ${channelType === 'text' ? '#' + channelName : '@' + channelName} (try @rover find messages about gaming)`}
               className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
             />
             <div className="flex items-center space-x-2 ml-3">
@@ -534,9 +607,9 @@ Try: "@rover summarize the past 30 minutes" or "@rover what did [username] discu
           
           {/* Enhanced hint for @rover */}
           {message.toLowerCase().includes('@rover') && (
-            <div className="mt-2 text-xs text-gray-400 flex items-center space-x-1">
-              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-              <span>ROVER AI will respond - try asking for conversation summaries!</span>
+            <div className="mt-2 text-xs text-gray-400 flex items-center space-x-2">
+              <Search className="w-3 h-3 text-blue-500 animate-pulse" />
+              <span>ROVER Enhanced Search & Navigation - try: "find servers about gaming" or "navigate to music channels"</span>
             </div>
           )}
         </div>
