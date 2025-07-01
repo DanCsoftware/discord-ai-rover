@@ -437,7 +437,7 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   return (
     <div className="flex h-full bg-gray-700">
       {/* Main Chat Area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 h-full">
         {/* Chat Header */}
         <DiscordChannelHeader 
           channelName={channelName}
@@ -446,10 +446,10 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
           showUserList={showUserList}
         />
 
-        {/* Messages - Now using ScrollArea */}
-        <div className="flex-1">
+        {/* Messages - Fixed ScrollArea implementation */}
+        <div className="flex-1 min-h-0">
           <ScrollArea className="h-full">
-            <div className="p-4 space-y-4">
+            <div className="p-4 space-y-4 min-h-full">
               {/* Profile Section - only show for DMs */}
               {channelType === 'dm' && (
                 <div className="flex flex-col items-center text-center py-8">
@@ -618,7 +618,7 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
         </div>
       </div>
 
-      {/* User List - only show for text channels when showUserList is true */}
+      {/* User List - also apply ScrollArea */}
       {channelType === 'text' && showUserList && (
         <DiscordUserList users={channelUsers} className="w-60 flex-shrink-0" />
       )}
