@@ -444,7 +444,16 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
     switch (searchResponse.type) {
       case 'search_results':
         if (searchResponse.results && searchResponse.results.length > 0) {
-          let response = `🔍 **Found ${searchResponse.results.length} results for "${originalQuery}" in ${activeUser.name}:**\n\n`;
+          // Filter results to current server only
+          const serverFilteredResults = searchResponse.results.filter(result => 
+            result.server === activeUser.name || !result.server
+          );
+          
+          if (serverFilteredResults.length === 0) {
+            return `I searched thoroughly but didn't find any results for "${originalQuery}" in **${activeUser.name}** server.\n\n💡 **Try:**\n• Using different keywords\n• Asking about a specific channel\n• Checking if you meant something else\n\nWhat would you like me to help you find? 🔍`;
+          }
+          
+          let response = `🔍 **Found ${serverFilteredResults.length} interaction(s) for "${originalQuery}" in ${activeUser.name}:**\n\n`;
           
           // Check if this is a harassment/moderation query and add rule context
           const isHarassmentQuery = originalQuery.toLowerCase().includes('harassment') || 
@@ -461,11 +470,15 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
             response += `📋 **Potential Violations Found:**\n`;
           }
           
-          searchResponse.results.slice(0, 5).forEach((result, index) => {
-            response += `**${index + 1}. ${result.title}**\n`;
-            response += `   🕐 ${result.timestamp || 'Unknown time'}\n`;
-            response += `   📍 #${result.channel}\n`;
-            response += `   👤 ${result.user}\n`;
+          serverFilteredResults.slice(0, 5).forEach((result, index) => {
+            // Format timestamp properly
+            const timeDisplay = result.timestamp === 'Unknown time' ? 
+              '🕐 Today' : `🕐 ${result.timestamp}`;
+            
+            response += `**${index + 1}. Conversation with ${result.user}**\n`;
+            response += `   ${timeDisplay}\n`;
+            response += `   📍 #${result.channel || channelName}\n`;
+            response += `   👤 ${result.user || 'Unknown user'}\n`;
             
             // Add rule violation analysis for harassment queries
             if (isHarassmentQuery) {
@@ -487,12 +500,12 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
             response += `• Report severe violations to server administrators\n\n`;
           }
           
-          response += searchResponse.results.length > 5 ? 
-            `*...and ${searchResponse.results.length - 5} more results in this server. Would you like me to show more?*` : 
-            `**What would you like to explore next?** I can help you dive deeper into any of these results! 🎯`;
+          response += serverFilteredResults.length > 5 ? 
+            `*...and ${serverFilteredResults.length - 5} more interactions in this server. Would you like me to show more?*` : 
+            `**Want to explore any of these conversations?** I can show you more details! 🎯`;
           return response;
         }
-        return `I searched thoroughly but didn't find specific results for "${originalQuery}" in ${activeUser.name}. Let me suggest some alternatives:\n\n• Try broader search terms\n• Check if you meant a different topic\n• Ask me to search in specific channels\n\n💡 **Tip:** I'm only searching within this server. What specific aspect interests you most? 🤔`;
+        return `I searched thoroughly but didn't find specific results for "${originalQuery}" in **${activeUser.name}** server.\n\n💡 **Try:**\n• Using different keywords\n• Asking about a specific channel or user\n• Checking recent conversations\n\nWhat would you like me to help you find? 🔍`;
 
       case 'threads':
         if (searchResponse.threads && searchResponse.threads.length > 0) {
