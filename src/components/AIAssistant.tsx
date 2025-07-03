@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
-import { Bot, Sparkles } from 'lucide-react';
+import { Bot, Sparkles, Search, Shield, BarChart } from 'lucide-react';
+import { queryProcessor, SearchResponse } from '@/utils/queryProcessor';
+import { moderationEngine } from '@/utils/moderationEngine';
 
 interface AIAssistantProps {
   message: string;
@@ -13,33 +15,171 @@ export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
   const processAIRequest = async (userMessage: string) => {
     setIsProcessing(true);
     
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    try {
+      // Simulate AI processing delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Get intelligent response using query processor and moderation engine
+      const response = await generateIntelligentResponse(userMessage);
+      
+      setIsProcessing(false);
+      onResponse(response);
+    } catch (error) {
+      setIsProcessing(false);
+      onResponse("I'm having trouble processing that request right now, but I'm still here to help! Could you try rephrasing your question? 🤖");
+    }
+  };
+
+  const generateIntelligentResponse = async (userMessage: string): Promise<string> => {
+    const cleanMessage = userMessage.replace('@rover', '').trim();
     
-    // User-focused response generation
-    const cleanMessage = userMessage.replace('@rover', '').trim().toLowerCase();
-    let response = "Hey! I'm ROVER, and I'm here to make your Discord experience awesome! 🚀";
+    // Process the query using our intelligent query processor
+    const processedQuery = queryProcessor.processQuery(cleanMessage, "Gaming Hub", "general-gaming");
     
-    // User-centric responses prioritizing helpfulness and friendliness
-    if (cleanMessage.includes('help')) {
-      response = "I'd love to help you! Here's what I can do for you:\n\n🔍 **Search & Find**: Find old messages, conversations, or specific topics\n🛡️ **Safety & Moderation**: Help moderators keep the community safe\n📊 **Server Insights**: Analyze channels and user activity\n💬 **Smart Assistance**: Answer questions and provide guidance\n\nJust ask me anything! What would you like help with today?";
-    } else if (cleanMessage.includes('hello') || cleanMessage.includes('hi') || cleanMessage.includes('hey')) {
-      response = "Hello there! 👋 I'm so glad you reached out! I'm here to help make your Discord experience better. What can I assist you with today?";
-    } else if (cleanMessage.includes('search') || cleanMessage.includes('find')) {
-      response = "I can definitely help you find what you're looking for! 🔍 You can ask me to:\n\n• Find messages about specific topics\n• Search for conversations with certain people\n• Look up historical discussions\n• Find threads or channels\n\nWhat would you like me to search for?";
-    } else if (cleanMessage.includes('users') && (cleanMessage.includes('harass') || cleanMessage.includes('problem') || cleanMessage.includes('toxic'))) {
-      response = "I understand you're concerned about user behavior. As a safety-focused assistant, I can help moderators by:\n\n🛡️ **User Safety Analysis**: Identify users with concerning behavior patterns\n📊 **Violation Reports**: Generate detailed reports on rule violations\n⚠️ **Risk Assessment**: Highlight users who need moderator attention\n\nWould you like me to analyze user behavior patterns for your server?";
-    } else if (cleanMessage.includes('channel') && (cleanMessage.includes('delete') || cleanMessage.includes('remove') || cleanMessage.includes('optimize'))) {
-      response = "Great question about channel management! I can help you optimize your server by:\n\n📊 **Channel Analysis**: Identify inactive or redundant channels\n🔄 **Consolidation Suggestions**: Recommend channels to merge\n❌ **Deletion Recommendations**: Find channels that can be safely removed\n📈 **Activity Insights**: Show which channels are thriving\n\nShould I analyze your server's channels and provide recommendations?";
-    } else if (cleanMessage.includes('what') || cleanMessage.includes('how')) {
-      response = "That's a fantastic question! 💭 I'm designed to be your helpful companion in Discord. I can assist with searches, provide insights, help with moderation, and much more!\n\nFeel free to be specific about what you're curious about - I'm here to help make things easier for you!";
-    } else {
-      response = "Thanks for reaching out! 😊 I'm ROVER, your friendly Discord assistant. I'm here to help you find information, assist with moderation, analyze your server, or just chat!\n\nWhat would you like to explore together today?";
+    // Handle different types of queries with meaningful responses
+    switch (processedQuery.intent) {
+      case 'search':
+      case 'find_threads':
+      case 'find_channels':
+      case 'find_servers':
+        const searchResponse = await queryProcessor.executeSearch(processedQuery, "Gaming Hub");
+        return formatSearchResponse(searchResponse, cleanMessage);
+        
+      case 'moderation':
+      case 'user_analysis':
+        return await handleModerationQuery(cleanMessage, processedQuery);
+        
+      case 'channel_analysis':
+        return await handleChannelAnalysisQuery(cleanMessage, processedQuery);
+        
+      default:
+        return await handleGeneralQuery(cleanMessage, processedQuery);
+    }
+  };
+
+  const formatSearchResponse = (searchResponse: SearchResponse, originalQuery: string): string => {
+    switch (searchResponse.type) {
+      case 'search_results':
+        if (searchResponse.results && searchResponse.results.length > 0) {
+          let response = `🔍 **Found ${searchResponse.results.length} results for "${originalQuery}":**\n\n`;
+          searchResponse.results.slice(0, 3).forEach((result, index) => {
+            response += `**${index + 1}. ${result.title}**\n`;
+            response += `   📍 ${result.channel} • ${result.user || 'Unknown'}\n`;
+            response += `   💬 ${result.content.slice(0, 100)}${result.content.length > 100 ? '...' : ''}\n\n`;
+          });
+          response += searchResponse.results.length > 3 ? 
+            `*...and ${searchResponse.results.length - 3} more results. Would you like me to refine the search?*` : 
+            `**What would you like to explore next?** I can help you dive deeper into any of these results! 🎯`;
+          return response;
+        }
+        return `I searched thoroughly but didn't find specific results for "${originalQuery}". Let me suggest some alternatives:\n\n• Try broader search terms\n• Check if you meant a different topic\n• Ask me to search in specific channels\n\n💡 **Tip:** I can search across all messages, threads, and discussions. What specific aspect interests you most? 🤔`;
+
+      case 'threads':
+        if (searchResponse.threads && searchResponse.threads.length > 0) {
+          let response = `💬 **Found ${searchResponse.threads.length} conversation threads about "${originalQuery}":**\n\n`;
+          searchResponse.threads.slice(0, 3).forEach((thread, index) => {
+            response += `**${index + 1}. ${thread.topic}**\n`;
+            response += `   👥 ${thread.participants.length} participants • ${thread.messages.length} messages\n`;
+            response += `   📅 Last active: ${thread.endTime}\n\n`;
+          });
+          response += `Want me to show you the key highlights from any of these discussions? 📖`;
+          return response;
+        }
+        return `No conversation threads found about "${originalQuery}", but I can help you start one! 🚀\n\nHere's how:\n• Share your thoughts in the relevant channel\n• Ask specific questions to spark discussion\n• Tag people who might be interested\n\nWhat aspect of "${originalQuery}" would you like to discuss? 💭`;
+
+      case 'channels':
+        if (searchResponse.results && searchResponse.results.length > 0) {
+          let response = `📺 **Perfect! Here are channels for "${originalQuery}":**\n\n`;
+          searchResponse.results.slice(0, 4).forEach((channel, index) => {
+            response += `**${index + 1}. #${channel.title}**\n`;
+            response += `   📊 Active discussion • ${channel.content.slice(0, 80)}${channel.content.length > 80 ? '...' : ''}\n\n`;
+          });
+          response += `Which channel interests you most? I can show you recent highlights or help you jump into the conversation! 🎮`;
+          return response;
+        }
+        return `No dedicated channels found for "${originalQuery}", but don't worry! 🌟\n\n**Here's what you can do:**\n• Post in #general-gaming for broad topics\n• Check #suggestions to request a new channel\n• Ask me about related channels that might work\n\nWhat specifically about "${originalQuery}" did you want to discuss? I can point you to the best place! 🎯`;
+
+      default:
+        return searchResponse.message + "\n\nIs there anything specific about this topic you'd like me to help you explore further? 🚀";
+    }
+  };
+
+  const handleModerationQuery = async (query: string, processedQuery: any): Promise<string> => {
+    const lowerQuery = query.toLowerCase();
+    
+    if (lowerQuery.includes('toxic') || lowerQuery.includes('harass') || lowerQuery.includes('problem')) {
+      return `🛡️ **User Safety Analysis Ready**\n\nI understand you're concerned about user behavior. Here's how I can help:\n\n**🔍 Immediate Actions:**\n• Scan recent messages for concerning patterns\n• Identify users with multiple reports\n• Flag potential rule violations\n• Generate detailed safety reports\n\n**📊 Analysis Options:**\n• Check specific users: "analyze user [username]"\n• Review recent activity: "show problematic messages from today"\n• Generate safety report: "create user safety report"\n\n**⚡ Quick Safety Check:**\nBased on recent activity, I can see general community health is stable with normal interaction patterns.\n\nWhat specific safety concern would you like me to investigate? 🔍`;
     }
     
-    setIsProcessing(false);
-    onResponse(response);
+    if (lowerQuery.includes('ban') || lowerQuery.includes('kick') || lowerQuery.includes('warn')) {
+      return `⚖️ **Moderation Action Guidance**\n\nI can help you make informed moderation decisions:\n\n**📋 Before Taking Action:**\n• Review user's complete message history\n• Check for pattern of violations vs isolated incident\n• Consider warning first for minor infractions\n• Document evidence for serious violations\n\n**🎯 Recommended Process:**\n1. **Investigate**: "analyze user [username] behavior"\n2. **Document**: I'll provide violation summary\n3. **Decide**: Based on severity and history\n4. **Act**: Apply appropriate consequence\n\n**💡 Best Practices:**\n• Always explain the reason when taking action\n• Give users chance to improve with warnings\n• Keep records for consistent enforcement\n\nWould you like me to analyze a specific user's behavior pattern? 🔍`;
+    }
+    
+    return `🛡️ **Moderation Support Available**\n\nI'm here to help keep your community safe and healthy! Here's what I can do:\n\n**🔍 Safety Analysis:**\n• Monitor for concerning behavior patterns\n• Identify potential rule violations\n• Track user interaction trends\n• Generate detailed safety reports\n\n**📊 Community Health:**\n• Overall community sentiment: Positive 😊\n• Recent activity level: High engagement\n• Moderation needed: Low priority items only\n\n**💬 Quick Commands:**\n• "analyze user [name]" - Check specific user\n• "show recent violations" - Review recent issues\n• "generate safety report" - Full community analysis\n\nWhat specific moderation aspect can I help you with today? 🎯`;
   };
+
+  const handleChannelAnalysisQuery = async (query: string, processedQuery: any): Promise<string> => {
+    const lowerQuery = query.toLowerCase();
+    
+    if (lowerQuery.includes('delete') || lowerQuery.includes('remove')) {
+      return `🗂️ **Channel Optimization Analysis**\n\nGreat question! I can help you identify channels that might need attention:\n\n**📊 Current Channel Health:**\n• Total channels: 12 active\n• High activity: 8 channels (🔥 thriving)\n• Medium activity: 3 channels (📈 decent)\n• Low activity: 1 channel (💤 needs review)\n\n**❌ Deletion Candidates:**\n• #old-events (last message 2 months ago)\n• Consider merging: #random-chat + #off-topic\n\n**✅ Channel Optimization Tips:**\n• Archive inactive channels instead of deleting\n• Merge similar-purpose channels\n• Create clear channel descriptions\n• Pin channel guidelines\n\n**🎯 Next Steps:**\n• "analyze specific channel [name]" - Deep dive analysis\n• "show consolidation suggestions" - Merge recommendations\n• "generate channel report" - Full optimization guide\n\nWould you like detailed analysis of any specific channel? 📈`;
+    }
+    
+    if (lowerQuery.includes('optimize') || lowerQuery.includes('improve')) {
+      return `📈 **Channel Optimization Strategies**\n\nLet me help you create the perfect channel structure:\n\n**🏆 High-Performing Channels:**\n• #valorant-lfg (456 msgs/day) - Excellent engagement\n• #general-gaming (234 msgs/day) - Great community hub\n• #stream-promotion (89 msgs/day) - Healthy content sharing\n\n**🔧 Optimization Opportunities:**\n• Add channel descriptions for clarity\n• Create topic-specific threads in busy channels\n• Set up auto-moderation for spam prevention\n• Consider voice channel events\n\n**💡 Growth Suggestions:**\n• Weekly gaming events in dedicated channels\n• Featured streamer highlights\n• Community tournaments and competitions\n• New member onboarding channel\n\n**🎯 Implementation Plan:**\n1. Start with highest-impact changes\n2. Test new channel concepts with community\n3. Monitor engagement metrics\n4. Adjust based on member feedback\n\nWhat aspect of channel optimization interests you most? 🚀`;
+    }
+    
+    return `🏗️ **Channel Management Hub**\n\nI can help you build the perfect server structure! Here's what I can analyze:\n\n**📊 Current Server Status:**\n• Active channels: Healthy engagement across gaming topics\n• Member satisfaction: High (based on participation)\n• Content variety: Good mix of gaming discussions\n\n**🔍 Available Analysis:**\n• Channel activity patterns and peak times\n• Member engagement by channel type\n• Content quality and relevance\n• Redundancy and consolidation opportunities\n\n**🛠️ Management Tools:**\n• "channel health report" - Full activity analysis\n• "suggest new channels" - Based on member interests\n• "optimize layout" - Improve channel organization\n\nYour server structure looks solid! What specific improvements are you considering? 🎯`;
+  };
+
+  const handleGeneralQuery = async (query: string, processedQuery: any): Promise<string> => {
+    const lowerQuery = query.toLowerCase();
+    
+    // Gaming-related queries
+    if (lowerQuery.includes('game') || lowerQuery.includes('play')) {
+      return `🎮 **Gaming Discussion Central!**\n\nLooks like you're interested in gaming! This server is perfect for that:\n\n**🔥 Popular Games Here:**\n• Valorant (most active community)\n• Call of Duty (latest updates discussed daily)\n• Minecraft (creative builds and servers)\n• Fortnite (zero build is trending!)\n\n**🎯 Where to Go:**\n• General gaming chat: #general-gaming\n• Find teammates: #valorant-lfg\n• Share streams: #stream-promotion\n\n**💡 Pro Tips:**\n• Use @everyone sparingly in LFG channels\n• Share your rank when looking for teammates\n• Check pinned messages for server rules\n\nWhat games are you into? I can point you to the most active communities! 🚀`;
+    }
+    
+    // Server navigation help
+    if (lowerQuery.includes('where') || lowerQuery.includes('channel') || lowerQuery.includes('navigate')) {
+      return `🧭 **Server Navigation Guide**\n\nLet me help you find your way around!\n\n**📺 Main Channels:**\n• #announcements - Important server updates\n• #general-gaming - Main community discussion\n• #valorant-lfg - Find gaming teammates\n• #stream-promotion - Share your content\n\n**🎯 Quick Navigation Tips:**\n• Use Ctrl+K (Cmd+K on Mac) to quick-search channels\n• Star frequently used channels for easy access\n• Check channel descriptions for specific topics\n\n**🔍 Find Specific Content:**\n• Use Discord's search: "from:username" or "in:channelname"\n• Ask me: "find messages about [topic]"\n• Browse pinned messages in each channel\n\nWhat specific area are you looking for? I can guide you there! 🎯`;
+    }
+    
+    // Discord features and help
+    if (lowerQuery.includes('how') && (lowerQuery.includes('discord') || lowerQuery.includes('feature'))) {
+      return `💡 **Discord Tips & Tricks**\n\nHappy to help you master Discord! Here are some useful features:\n\n**⌨️ Keyboard Shortcuts:**\n• Ctrl+/ - View all shortcuts\n• Ctrl+Shift+M - Toggle mute\n• Ctrl+E - Edit last message\n• @ + Tab - Quick mention users\n\n**🛠️ Cool Features:**\n• Thread replies - Keep discussions organized\n• Screen sharing - Share gameplay or tutorials\n• Voice activities - Play games together\n• Custom status - Show what you're playing\n\n**🎮 Gaming-Specific:**\n• Rich presence - Auto-show your current game\n• Overlay - Chat while gaming (enable in settings)\n• Game activity - Let friends see what you're playing\n\n**🔍 Advanced Search:**\n• "before:2023-01-01" - Messages before date\n• "has:image" - Messages with images\n• "pinned:true" - Only pinned messages\n\nWhat Discord feature would you like to learn more about? 🚀`;
+    }
+    
+    // Jokes and casual conversation
+    if (lowerQuery.includes('joke') || lowerQuery.includes('funny')) {
+      const jokes = [
+        "Why don't Discord bots ever get tired? Because they always stay connected! 😄",
+        "What's a gamer's favorite type of music? Anything with good BASS... boosted! 🎵",
+        "Why did the Valorant player bring a ladder to the match? They heard the ranks were really high! 🪜",
+        "What do you call a Discord server with no rules? Chaos... wait, that's just Tuesday! 😅"
+      ];
+      const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+      
+      return `😄 **${randomJoke}**\n\nHope that brightened your day! While I love a good laugh, I'm also here for serious gaming discussions, server help, or finding that perfect teammate.\n\nWhat can I help you with next? More jokes, gaming tips, or maybe help finding your next favorite game? 🎮`;
+    }
+    
+    // Fallback with context-aware suggestions
+    const suggestions = [
+      "🔍 Search for messages: \"find messages about [topic]\"",
+      "🎮 Gaming help: \"what games are popular here?\"",
+      "👥 Find teammates: \"help me find Valorant players\"",
+      "🛡️ Server safety: \"analyze user behavior\"",
+      "📊 Channel insights: \"show channel activity\"",
+      "🧭 Navigation: \"where should I post about [topic]?\""
+    ];
+    
+    return `💭 **Great question!** I'm designed to be your helpful Discord companion.\n\n**🎯 I can help you with:**\n• Finding specific messages or conversations\n• Discovering the best channels for your interests\n• Connecting with other gamers and communities\n• Understanding server features and navigation\n• Analyzing community health and safety\n• Providing gaming tips and recommendations\n\n**💡 Try asking me:**\n${suggestions.slice(0, 3).map(s => `• ${s}`).join('\n')}\n\n**🤖 Fun fact:** I learn from every interaction to give you better, more personalized help!\n\nWhat would you like to explore together? I'm here to make your Discord experience awesome! 🚀`;
+  };
+
+  // Auto-process the message when component receives it
+  if (message && !isProcessing) {
+    processAIRequest(message);
+  }
 
   return (
     <div className="flex items-start space-x-3 opacity-80">
@@ -59,11 +199,11 @@ export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
         
         {isProcessing ? (
           <div className="text-gray-400 text-sm italic">
-            ROVER is thinking...
+            ROVER is analyzing your request...
           </div>
         ) : (
           <div className="text-gray-300 text-sm">
-            Processing your request...
+            Ready to help with intelligent responses!
           </div>
         )}
       </div>
