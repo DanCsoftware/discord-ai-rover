@@ -453,17 +453,10 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
             return `I searched thoroughly but didn't find any results for "${originalQuery}" in **${activeUser.name}** server.\n\n💡 **Try:**\n• Using different keywords\n• Asking about a specific channel\n• Checking if you meant something else\n\nWhat would you like me to help you find? 🔍`;
           }
           
-          // Detect query type for better formatting
+          // Check if this is a user interaction query
           const isUserQuery = originalQuery.toLowerCase().includes('users i talked to') || 
                              originalQuery.toLowerCase().includes('conversations') ||
                              originalQuery.toLowerCase().includes('recent users');
-          
-          const isAnnouncementQuery = originalQuery.toLowerCase().includes('announcement') ||
-                                    originalQuery.toLowerCase().includes('news') ||
-                                    originalQuery.toLowerCase().includes('update');
-          
-          const isSummaryQuery = originalQuery.toLowerCase().includes('summarize') ||
-                               originalQuery.toLowerCase().includes('summary');
           
           // Check if this is a harassment/moderation query (used later)
           const isHarassmentQuery = originalQuery.toLowerCase().includes('harassment') || 
@@ -473,38 +466,7 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
           
           let response = '';
           
-          if (isAnnouncementQuery || isSummaryQuery) {
-            // Special formatting for announcements
-            response = `📢 **Found ${serverFilteredResults.length} announcement(s) in ${activeUser.name}:**\n\n`;
-            
-            serverFilteredResults.slice(0, 5).forEach((result, index) => {
-              const timeDisplay = result.timestamp && result.timestamp !== 'Unknown time' ? 
-                `📅 ${result.timestamp}` : '📅 Recent';
-              
-              const channelDisplay = result.channel ? `#${result.channel}` : '#announcements';
-              const authorDisplay = result.user && result.user !== 'Unknown user' ? result.user : 'Server Admin';
-              
-              response += `**${index + 1}. ${isSummaryQuery ? 'Latest Update' : 'Announcement'}**\n`;
-              response += `   ${timeDisplay}\n`;
-              response += `   📍 ${channelDisplay}\n`;
-              response += `   👤 Posted by: ${authorDisplay}\n`;
-              response += `   📝 **Content:** ${result.content || 'Click to view full announcement'}\n\n`;
-              
-              if (isSummaryQuery) {
-                response += `   🔍 **Key Points:**\n`;
-                response += `   • Check this announcement for important updates\n`;
-                response += `   • Make sure to follow any new guidelines mentioned\n`;
-                response += `   • Note any upcoming events or deadlines\n\n`;
-              }
-            });
-            
-            if (isSummaryQuery) {
-              response += `💡 **What to expect:** These announcements contain important server updates, rule changes, events, and community news. Stay informed! 📬`;
-            } else {
-              response += `Want me to provide more details about any specific announcement? 🔍`;
-            }
-            
-          } else if (isUserQuery) {
+          if (isUserQuery) {
             // Group results by user to show unique conversations
             const userConversations = new Map();
             serverFilteredResults.forEach(result => {
