@@ -9,6 +9,7 @@ export interface Message {
   hasButtons?: boolean;
   buttons?: string[];
   navigationGuide?: any; // For special navigation responses
+  specialComponent?: any; // For special UI components like fact-checks and server recommendations
   hasInvite?: boolean;
   hasLinks?: boolean;
   links?: string[];

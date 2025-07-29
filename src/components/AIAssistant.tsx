@@ -6,10 +6,14 @@ import { moderationEngine } from '@/utils/moderationEngine';
 import { parseSummaryRequest, generateSummary, filterMessagesByTime, filterMessagesByUser } from '@/utils/conversationAnalyzer';
 import { servers } from '@/data/discordData';
 import { NavigationGuide } from '@/utils/navigationGuide';
+import { knowledgeEngine, KnowledgeResult } from '@/utils/knowledgeEngine';
+import { serverDiscovery, ServerRecommendation } from '@/utils/serverDiscovery';
+import { ServerRecommendations } from '@/components/ServerRecommendations';
+import { FactCheckResults } from '@/components/FactCheckResults';
 
 interface AIAssistantProps {
   message: string;
-  onResponse: (response: string, navigationGuide?: any) => void;
+  onResponse: (response: string, navigationGuide?: any, specialComponent?: any) => void;
 }
 
 export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
@@ -49,6 +53,16 @@ export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
       return handleSummarizationRequest(cleanMessage);
     }
     
+    // Check for knowledge/fact-checking requests
+    if (isKnowledgeQuery(cleanMessage)) {
+      return handleKnowledgeQuery(cleanMessage);
+    }
+
+    // Check for server discovery requests
+    if (isServerDiscoveryQuery(cleanMessage)) {
+      return handleServerDiscoveryQuery(cleanMessage);
+    }
+
     // Check for navigation requests
     if (NavigationGuide.isNavigationQuery(cleanMessage)) {
       const guide = NavigationGuide.findGuide(cleanMessage);
@@ -200,6 +214,87 @@ export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
     }
     
     return message; // Fallback for unmatched conversational messages
+  };
+
+  const isKnowledgeQuery = (message: string): boolean => {
+    const lowerMessage = message.toLowerCase();
+    const knowledgePatterns = [
+      /fact check/i,
+      /is it true/i,
+      /verify/i,
+      /tell me about/i,
+      /what is/i,
+      /how does/i,
+      /explain/i,
+      /information about/i,
+      /really/i,
+      /actually/i
+    ];
+    
+    return knowledgePatterns.some(pattern => pattern.test(message));
+  };
+
+  const isServerDiscoveryQuery = (message: string): boolean => {
+    const lowerMessage = message.toLowerCase();
+    const discoveryPatterns = [
+      /recommend.*servers?/i,
+      /find.*servers?/i,
+      /similar.*servers?/i,
+      /servers?.*like/i,
+      /suggest.*servers?/i,
+      /servers?.*about/i,
+      /communities.*for/i,
+      /discover.*servers?/i
+    ];
+    
+    return discoveryPatterns.some(pattern => pattern.test(message));
+  };
+
+  const handleKnowledgeQuery = async (query: string): Promise<string> => {
+    try {
+      const result = await knowledgeEngine.processKnowledgeQuery(query);
+      
+      // If it's a fact-check, show the special component
+      if (result.factCheck) {
+        setTimeout(() => {
+          onResponse("", null, { type: 'fact-check', data: result });
+        }, 0);
+        return "";
+      }
+      
+      // Otherwise, format as text response
+      return knowledgeEngine.formatKnowledgeResponse(result);
+    } catch (error) {
+      return `🤖 **ROVER Knowledge System**: I'm having trouble accessing my knowledge base right now. Could you try rephrasing your question or be more specific about what you'd like to know? 🧠`;
+    }
+  };
+
+  const handleServerDiscoveryQuery = async (query: string): Promise<string> => {
+    try {
+      // Determine if they want similar servers or discovery by interest
+      const lowerQuery = query.toLowerCase();
+      let recommendations: ServerRecommendation[] = [];
+
+      if (lowerQuery.includes('similar') || lowerQuery.includes('like this')) {
+        // Find similar servers to current one
+        recommendations = serverDiscovery.findSimilarServers("1", query);
+      } else {
+        // Discover servers by query
+        recommendations = serverDiscovery.discoverServersByQuery(query);
+      }
+
+      if (recommendations.length > 0) {
+        // Show the server recommendations component
+        setTimeout(() => {
+          onResponse("", null, { type: 'server-recommendations', data: recommendations });
+        }, 0);
+        return "";
+      } else {
+        return `🔍 **Server Discovery**: I couldn't find servers matching "${query}" right now. Try:\n\n• Being more specific about interests\n• Using broader terms like "gaming" or "music"\n• Asking for "competitive" or "casual" communities\n\nWhat type of community vibe are you looking for? 🌟`;
+      }
+    } catch (error) {
+      return `🌟 **Server Discovery**: I'm having trouble with server recommendations right now. Could you try being more specific about what kind of community you're looking for? (gaming, music, art, etc.) 🔍`;
+    }
   };
 
   const isSummarizationRequest = (message: string): boolean => {

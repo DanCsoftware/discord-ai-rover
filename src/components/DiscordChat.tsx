@@ -7,6 +7,8 @@ import { AIAssistant } from "./AIAssistant";
 import DiscordChannelHeader from "./DiscordChannelHeader";
 import DiscordUserList from "./DiscordUserList";
 import { NavigationHelper } from "./NavigationHelper";
+import { ServerRecommendations } from "./ServerRecommendations";
+import { FactCheckResults } from "./FactCheckResults";
 import { extractLinksFromText, generateSafetyReport, LinkSafetyReport, generateSmartLinkResponse } from "@/utils/linkSafetyAnalyzer";
 import { 
   parseSummaryRequest, 
@@ -369,75 +371,39 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType }: Discord
   };
 
   const handleAIResponse = async (userMessage: string) => {
-    // Create AI Assistant component and get response
-    const aiAssistant = document.createElement('div');
+    setShowAIAssistant(true);
     
-    // Use the enhanced AI Assistant for generating intelligent responses
-    import('./AIAssistant').then(({ AIAssistant }) => {
-      // Create a temporary component to generate the response
-      const generateResponse = async () => {
-        const cleanMessage = userMessage.replace('@rover', '').trim();
-        
-        try {
-          // Process the query using our intelligent query processor with server filtering
-          const processedQuery = queryProcessor.processQuery(cleanMessage, activeUser.name, channelName);
-          // Ensure we only search within the current server
-          processedQuery.searchQuery.server = activeUser.name;
-          
-          // Handle different types of queries with meaningful responses
-          let response = "";
-          
-          switch (processedQuery.intent) {
-            case 'search':
-            case 'find_threads':
-            case 'find_channels':
-            case 'find_servers':
-              const searchResponse = await queryProcessor.executeSearch(processedQuery, activeUser.name);
-              response = formatSearchResponse(searchResponse, cleanMessage);
-              break;
-              
-            case 'moderation':
-            case 'user_analysis':
-              response = await handleModerationQuery(cleanMessage, processedQuery);
-              break;
-              
-            case 'channel_analysis':
-              response = await handleChannelAnalysisQuery(cleanMessage, processedQuery);
-              break;
-              
-            default:
-              response = await handleGeneralQuery(cleanMessage, processedQuery);
-          }
-          
-          const aiMessage: Message = {
-            id: Date.now() + 1,
-            user: 'ROVER',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            content: response,
-            isBot: true
-          };
-
-          setChatMessages(prev => [...prev, aiMessage]);
-          setShowAIAssistant(false);
-        } catch (error) {
-          const errorResponse = "I'm having trouble processing that request right now, but I'm still here to help! Could you try rephrasing your question? 🤖";
-          
-          const aiMessage: Message = {
-            id: Date.now() + 1,
-            user: 'ROVER', 
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            content: errorResponse,
-            isBot: true
-          };
-
-          setChatMessages(prev => [...prev, aiMessage]);
-          setShowAIAssistant(false);
-        }
+    // Use the new AI Assistant to get response with special components
+    const handleResponse = (response: string, navigationGuide?: any, specialComponent?: any) => {
+      const aiMessage: Message = {
+        id: Date.now() + 1,
+        user: 'ROVER',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        content: response,
+        isBot: true,
+        navigationGuide,
+        specialComponent
       };
-      
-      // Add delay for realistic processing
-      setTimeout(generateResponse, 1500);
-    });
+
+      setChatMessages(prev => [...prev, aiMessage]);
+      setShowAIAssistant(false);
+    };
+
+    // Create a temporary AI Assistant instance to process the message
+    const aiAssistantElement = document.createElement('div');
+    try {
+      const { AIAssistant } = await import('./AIAssistant');
+      // The AIAssistant will call handleResponse with the result
+      const assistant = new (AIAssistant as any)({ 
+        message: userMessage, 
+        onResponse: handleResponse 
+      });
+      // Process the request
+      await assistant.processAIRequest(userMessage);
+    } catch (error) {
+      console.error('AI Assistant error:', error);
+      handleResponse("I'm having trouble processing that request right now, but I'm still here to help! Could you try rephrasing your question? 🤖");
+    }
   };
 
   // Helper functions for AI response generation (moved from AIAssistant)
