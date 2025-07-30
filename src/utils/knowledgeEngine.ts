@@ -125,14 +125,24 @@ export class KnowledgeEngine {
   }
 
   private isFactCheckQuery(query: string): boolean {
+    // Much more specific fact-check patterns to avoid false positives
     const factCheckPatterns = [
+      /^fact check/i,
       /is it true that/i,
-      /fact check/i,
-      /verify/i,
-      /is.*actually/i,
-      /really/i,
-      /true or false/i
+      /verify that/i,
+      /true or false/i,
+      /can you verify/i
     ];
+    
+    // Don't treat casual language as fact-checking
+    const casualWords = ['really', 'actually'];
+    const isCasualOnly = casualWords.some(word => 
+      query.toLowerCase().includes(word) && 
+      !factCheckPatterns.some(pattern => pattern.test(query))
+    );
+    
+    if (isCasualOnly) return false;
+    
     return factCheckPatterns.some(pattern => pattern.test(query));
   }
 
@@ -337,30 +347,30 @@ export class KnowledgeEngine {
       };
     }
 
-    // Generic fact-check response
+    // More helpful fact-check response with actionable suggestions
     return {
-      explanation: `🔍 **Fact Check Results**: I've analyzed multiple sources regarding "${claim}". The evidence suggests this requires careful consideration of context and source reliability.`,
-      confidence: 0.7,
+      explanation: `🔍 **Fact Check Request**: I understand you're asking about "${claim}". While I can't verify every specific claim, I can help you find reliable information!\n\n🌟 **How I can better help you:**\n• Ask about specific gaming topics I know well\n• Request server recommendations if you're looking for communities\n• Search for information within this Discord server\n• Get help with Discord features and tips`,
+      confidence: 0.8,
       sources: [
         {
-          title: 'Fact-checking Database',
-          url: 'https://example.com/factcheck',
-          excerpt: `Analysis of claim: ${claim}`,
-          reliability: 'medium' as const
+          title: 'ROVER Knowledge Base',
+          url: 'https://discord.com/support',
+          excerpt: 'I specialize in Discord communities, gaming, and server discovery',
+          reliability: 'high' as const
         }
       ],
       relatedQuestions: [
-        'More evidence about this claim',
-        'Similar fact-check topics',
-        'How to verify information'
+        'What gaming communities can you recommend?',
+        'How do I find active Discord servers?',
+        'Can you help me search this server?'
       ],
       verdict: {
         claim,
         verdict: 'unverified' as const,
         evidence: [
-          'Multiple sources needed',
-          'Context dependent',
-          'Requires further verification'
+          'I focus on Discord and gaming assistance',
+          'For fact-checking, try specialized fact-check websites',
+          'I can help with server discovery and gaming questions instead'
         ]
       }
     };

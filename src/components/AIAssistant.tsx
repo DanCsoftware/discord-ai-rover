@@ -34,15 +34,15 @@ const generateIntelligentResponse = async (userMessage: string, onResponse: (res
     return { message: handleConversationalMessage(cleanMessage) };
   }
   
-  // Check for knowledge queries
-  if (isKnowledgeQuery(cleanMessage)) {
-    const result = await handleKnowledgeQuery(cleanMessage);
+  // Check for server discovery queries FIRST (prioritize over fact-checking)
+  if (isServerDiscoveryQuery(cleanMessage)) {
+    const result = await handleServerDiscoveryQuery(cleanMessage);
     return result;
   }
 
-  // Check for server discovery queries
-  if (isServerDiscoveryQuery(cleanMessage)) {
-    const result = await handleServerDiscoveryQuery(cleanMessage);
+  // Check for knowledge queries (now more specific)
+  if (isKnowledgeQuery(cleanMessage)) {
+    const result = await handleKnowledgeQuery(cleanMessage);
     return result;
   }
 
@@ -87,20 +87,31 @@ const generateIntelligentResponse = async (userMessage: string, onResponse: (res
 
 const isKnowledgeQuery = (message: string): boolean => {
   const lowerMessage = message.toLowerCase();
-  const knowledgePatterns = [
+  
+  // More specific fact-check patterns that don't interfere with server discovery
+  const factCheckPatterns = [
     /fact check/i,
-    /is it true/i,
-    /verify/i,
+    /is it true that/i,
+    /verify that/i,
+    /true or false/i
+  ];
+  
+  // Knowledge patterns that aren't related to server discovery
+  const knowledgePatterns = [
     /tell me about/i,
     /what is/i,
     /how does/i,
     /explain/i,
-    /information about/i,
-    /really/i,
-    /actually/i
+    /information about/i
   ];
   
-  return knowledgePatterns.some(pattern => pattern.test(message));
+  // Don't treat as knowledge query if it's clearly about servers
+  if (isServerDiscoveryQuery(message)) {
+    return false;
+  }
+  
+  return factCheckPatterns.some(pattern => pattern.test(message)) || 
+         knowledgePatterns.some(pattern => pattern.test(message));
 };
 
 const handleKnowledgeQuery = async (userMessage: string): Promise<{ message: string; specialComponent: any }> => {
@@ -125,10 +136,18 @@ const isServerDiscoveryQuery = (message: string): boolean => {
     /suggest.*servers?/i,
     /servers?.*about/i,
     /communities.*for/i,
-    /discover.*servers?/i
+    /discover.*servers?/i,
+    /(any.*more|more.*servers?).*like/i,
+    /enjoying.*server.*more/i,
+    /(others?|more).*similar/i
   ];
   
-  return discoveryPatterns.some(pattern => pattern.test(message));
+  // Strong indicators this is about server discovery
+  const serverContext = lowerMessage.includes('server') || lowerMessage.includes('community');
+  const enjoymentContext = lowerMessage.includes('enjoying') || lowerMessage.includes('love') || lowerMessage.includes('like');
+  
+  return discoveryPatterns.some(pattern => pattern.test(message)) ||
+         (serverContext && enjoymentContext && (lowerMessage.includes('more') || lowerMessage.includes('similar')));
 };
 
 const handleServerDiscoveryQuery = async (userMessage: string): Promise<{ message: string; specialComponent: any }> => {

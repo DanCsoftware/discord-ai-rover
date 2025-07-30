@@ -368,13 +368,12 @@ export class ServerDiscoveryEngine {
 
   formatServerRecommendations(recommendations: ServerRecommendation[]): string {
     if (recommendations.length === 0) {
-      return "🔍 **No similar servers found** - but that makes this community unique! 🌟";
+      return `🔍 **No perfect matches yet, but here are some great options!**\n\n🌟 **I recommend checking out:**\n• Gaming communities with active LFG channels\n• Servers with similar game focuses\n• Communities that match your activity level\n\n💡 **Pro tip:** Try asking me "recommend servers for competitive gaming" or "find casual gaming communities" for more specific results!`;
     }
 
-    let response = `🌟 **Server Discovery Results** 🌟\n\n`;
-    response += `**Found ${recommendations.length} amazing communities you'd love:**\n\n`;
+    let response = `🎯 **Perfect! Found ${recommendations.length} servers you'll absolutely love:**\n\n`;
 
-    recommendations.slice(0, 5).forEach((rec, index) => {
+    recommendations.slice(0, 4).forEach((rec, index) => {
       const score = Math.round(rec.matchScore * 100);
       const activityEmoji = {
         'low': '📊',
@@ -383,23 +382,32 @@ export class ServerDiscoveryEngine {
         'very_high': '🚀'
       };
 
-      response += `**${index + 1}. ${rec.server.name}** (${score}% match)\n`;
-      response += `├─ 🎯 ${rec.category} • ${activityEmoji[rec.memberActivity]} ${rec.memberActivity.replace('_', ' ')} activity\n`;
-      response += `├─ 💭 ${rec.communityVibe}\n`;
+      response += `**${index + 1}. 🏆 ${rec.server.name}** (${score}% match)\n`;
+      response += `   ${activityEmoji[rec.memberActivity]} **${rec.memberActivity.replace('_', ' ')} activity** • ${rec.category}\n`;
+      response += `   💬 *"${rec.communityVibe}"*\n`;
       
       if (rec.primaryGames && rec.primaryGames.length > 0) {
-        response += `├─ 🎮 Games: ${rec.primaryGames.slice(0, 3).join(', ')}\n`;
+        response += `   🎮 **Top Games:** ${rec.primaryGames.slice(0, 3).join(', ')}\n`;
       }
       
       if (rec.specialFeatures && rec.specialFeatures.length > 0) {
-        response += `├─ ✨ Features: ${rec.specialFeatures.slice(0, 2).join(', ')}\n`;
+        response += `   ✨ **Special Features:** ${rec.specialFeatures.slice(0, 2).join(', ')}\n`;
       }
       
-      response += `└─ 🔍 Match: ${rec.matchReasons.slice(0, 2).join(', ')}\n\n`;
+      response += `   🎯 **Why it's perfect:** ${rec.matchReasons.slice(0, 2).join(', ')}\n`;
+      response += `   🔗 **Ready to join?** Look for invite links or ask for an invite!\n\n`;
     });
 
-    response += `🚀 **Want to explore?** These communities are welcoming new members!\n`;
-    response += `💡 **Pro tip:** Check their rules and introduce yourself when you join!`;
+    if (recommendations.length > 4) {
+      response += `*...plus ${recommendations.length - 4} more excellent matches!*\n\n`;
+    }
+
+    response += `🚀 **Next Steps:**\n`;
+    response += `• Browse these servers and see which vibe appeals to you\n`;
+    response += `• Check their member count and recent activity\n`;
+    response += `• Read their rules and introduction channels\n`;
+    response += `• Don't be shy - introduce yourself when you join!\n\n`;
+    response += `💡 **Need more help?** Ask me to "find [specific game] servers" or "recommend [competitive/casual] communities"!`;
 
     return response;
   }
