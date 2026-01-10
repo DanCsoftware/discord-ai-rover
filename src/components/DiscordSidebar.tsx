@@ -1,6 +1,6 @@
-import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight, Gamepad2, Music, Code, Sparkles, Dumbbell, Film, Compass } from "lucide-react";
+import { Bot, Hash, Volume2, Settings, Headphones, Mic, ChevronDown, ChevronRight, Gamepad2, Music, Code, Sparkles, Dumbbell, Film, Compass, Crown, Shield } from "lucide-react";
 import { useState } from "react";
-import { servers, ServerIconStyle } from "@/data/discordData";
+import { servers, ServerIconStyle, currentUserMemberships } from "@/data/discordData";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -120,44 +120,69 @@ const DiscordSidebar = ({
         
         <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor: 'hsl(var(--discord-bg-quaternary))' }}></div>
         
-        {servers.map((server) => (
-          <div
-            key={server.id}
-            onClick={() => onServerClick(server.id)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 overflow-hidden ${
-              isServerActive(server.id) ? "rounded-2xl" : "hover:rounded-2xl"
-            }`}
-            style={{ 
-              background: server.iconStyle?.background || (isServerActive(server.id) ? 'hsl(var(--discord-brand))' : 'hsl(var(--discord-bg-primary))'),
-              color: 'white'
-            }}
-            title={server.name}
-          >
-            {server.iconStyle ? (
-              server.iconStyle.iconName && iconMap[server.iconStyle.iconName] ? (
-                React.createElement(iconMap[server.iconStyle.iconName], {
-                  className: "w-6 h-6",
-                  style: { color: server.iconStyle.iconColor }
-                })
-              ) : (
-                <span 
-                  className="font-bold" 
+        {servers.map((server) => {
+          const membership = currentUserMemberships.find(m => m.serverId === server.id);
+          const isAdmin = membership?.role === 'admin' || membership?.role === 'owner';
+          const isMod = membership?.role === 'moderator';
+          
+          return (
+            <div key={server.id} className="relative">
+              <div
+                onClick={() => onServerClick(server.id)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 overflow-hidden ${
+                  isServerActive(server.id) ? "rounded-2xl" : "hover:rounded-2xl"
+                }`}
+                style={{ 
+                  background: server.iconStyle?.background || (isServerActive(server.id) ? 'hsl(var(--discord-brand))' : 'hsl(var(--discord-bg-primary))'),
+                  color: 'white',
+                  boxShadow: isAdmin ? '0 0 0 2px #f97316' : isMod ? '0 0 0 2px #5865f2' : 'none'
+                }}
+                title={server.name}
+              >
+                {server.iconStyle ? (
+                  server.iconStyle.iconName && iconMap[server.iconStyle.iconName] ? (
+                    React.createElement(iconMap[server.iconStyle.iconName], {
+                      className: "w-6 h-6",
+                      style: { color: server.iconStyle.iconColor }
+                    })
+                  ) : (
+                    <span 
+                      className="font-bold" 
+                      style={{ 
+                        color: server.iconStyle.iconColor,
+                        fontSize: server.iconStyle.textSize || '1.25rem',
+                        fontWeight: server.iconStyle.fontWeight || '700'
+                      }}
+                    >
+                      {server.iconStyle.text}
+                    </span>
+                  )
+                ) : server.icon.startsWith("/") || server.icon.startsWith("http") ? (
+                  <img src={server.icon} alt={server.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xl">{server.icon}</span>
+                )}
+              </div>
+              {/* Admin/Mod Badge */}
+              {(isAdmin || isMod) && (
+                <div 
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
                   style={{ 
-                    color: server.iconStyle.iconColor,
-                    fontSize: server.iconStyle.textSize || '1.25rem',
-                    fontWeight: server.iconStyle.fontWeight || '700'
+                    backgroundColor: isAdmin ? '#f97316' : '#5865f2',
+                    border: '2px solid hsl(var(--discord-bg-tertiary))'
                   }}
+                  title={isAdmin ? 'Admin' : 'Moderator'}
                 >
-                  {server.iconStyle.text}
-                </span>
-              )
-            ) : server.icon.startsWith("/") || server.icon.startsWith("http") ? (
-              <img src={server.icon} alt={server.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xl">{server.icon}</span>
-            )}
-          </div>
-        ))}
+                  {isAdmin ? (
+                    <Crown className="w-2.5 h-2.5 text-white" />
+                  ) : (
+                    <Shield className="w-2.5 h-2.5 text-white" />
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
         <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor: 'hsl(var(--discord-bg-quaternary))' }}></div>
         <div 
           className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer hover:rounded-2xl transition-all duration-200"

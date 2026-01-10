@@ -2,8 +2,10 @@ import DiscordSidebar from "@/components/DiscordSidebar";
 import DiscordChat from "@/components/DiscordChat";
 import DiscordUserPanel from "@/components/DiscordUserPanel";
 import DiscordDiscovery from "@/components/DiscordDiscovery";
+import AdminModerationPanel from "@/components/AdminModerationPanel";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useDiscordState } from "@/hooks/useDiscordState";
+import { servers } from "@/data/discordData";
 
 const Index = () => {
   const {
@@ -13,6 +15,7 @@ const Index = () => {
     isDMView,
     isDiscoverView,
     activeServer,
+    isCurrentServerAdmin,
     switchToChannel,
     switchToDM,
     switchToDMView,
@@ -21,6 +24,8 @@ const Index = () => {
     getCurrentMessages,
     getCurrentChannelName
   } = useDiscordState();
+
+  const currentServerName = servers.find(s => s.id === activeServer)?.name || 'Unknown Server';
 
   // When in discover view, use a simple flex layout (no resizable panels needed)
   if (isDiscoverView) {
@@ -86,12 +91,20 @@ const Index = () => {
           className="hidden lg:flex opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:opacity-100" 
         />
         
-        {/* Show user panel only for DMs */}
-        {activeChannelType === 'dm' && (
+        {/* Show admin panel for admin servers, user panel for DMs */}
+        {isCurrentServerAdmin && activeChannelType === 'text' ? (
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="hidden lg:block">
+            <AdminModerationPanel 
+              serverName={currentServerName}
+              serverId={activeServer}
+              messages={getCurrentMessages()}
+            />
+          </ResizablePanel>
+        ) : activeChannelType === 'dm' ? (
           <ResizablePanel defaultSize={20} minSize={0} maxSize={25} className="hidden lg:block">
             <DiscordUserPanel activeUser={activeUser} />
           </ResizablePanel>
-        )}
+        ) : null}
       </ResizablePanelGroup>
     </div>
   );

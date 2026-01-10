@@ -70,6 +70,19 @@ export interface ServerDiscoveryMeta {
   isVerified: boolean;
 }
 
+export interface ServerMembership {
+  serverId: number;
+  role: 'owner' | 'admin' | 'moderator' | 'member';
+}
+
+// Current user's server memberships - defines which servers user has admin/mod access to
+export const currentUserMemberships: ServerMembership[] = [
+  { serverId: 9, role: 'admin' },    // Crypto Central - user is admin
+  { serverId: 2, role: 'moderator' }, // Gaming Hub - user is mod
+  { serverId: 4, role: 'member' },    // Midjourney - regular member
+  { serverId: 5, role: 'member' },    // Dev Community - regular member
+];
+
 const MALICIOUS_DOMAINS = [
   'bit.ly/malware',
   'suspicious-discord.com',
