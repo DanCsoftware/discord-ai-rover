@@ -29,20 +29,31 @@ export const useRoverChat = (): UseRoverChatReturn => {
     setStreamingResponse('');
     setError(null);
 
+    // Validate configuration before making any request
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      const configError = 'ROVER is not configured. Backend connection missing. Please check environment setup.';
+      setError(configError);
+      setIsStreaming(false);
+      throw new Error(configError);
+    }
+
     const cleanMessage = userMessage.replace(/@rover/gi, '').trim();
     
     const messages: ChatMessage[] = [
       { role: 'user', content: cleanMessage }
     ];
 
-    const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rover-chat`;
+    const CHAT_URL = `${supabaseUrl}/functions/v1/rover-chat`;
 
     try {
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${supabaseKey}`,
         },
         body: JSON.stringify({ 
           messages,
@@ -60,7 +71,19 @@ export const useRoverChat = (): UseRoverChatReturn => {
 
       if (!resp.ok) {
         const errorData = await resp.json().catch(() => ({}));
-        const errorMessage = errorData.error || 'Failed to get AI response';
+        let errorMessage = errorData.error || 'Failed to get AI response';
+        
+        // Provide specific, helpful error messages based on status code
+        if (resp.status === 402) {
+          errorMessage = 'AI credits exhausted. Please check your workspace credits.';
+        } else if (resp.status === 429) {
+          errorMessage = 'Rate limited. Please wait a moment and try again.';
+        } else if (resp.status === 404) {
+          errorMessage = 'ROVER service unavailable. Backend may need redeployment.';
+        } else if (resp.status >= 500) {
+          errorMessage = 'Server error. Please try again in a moment.';
+        }
+        
         setError(errorMessage);
         setIsStreaming(false);
         throw new Error(errorMessage);

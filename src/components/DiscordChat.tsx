@@ -397,10 +397,24 @@ const DiscordChat = ({ channelName, messages, activeUser, channelType, activeSer
       );
     } catch (error) {
       console.error('AI Assistant error:', error);
+      
+      // Provide user-friendly error messages based on error type
+      let userMessage = "I'm having trouble processing that request right now. Could you try again? 🤖";
+      
+      const errorStr = roverError || (error instanceof Error ? error.message : '');
+      
+      if (errorStr.includes('credits')) {
+        userMessage = "I'm currently unavailable due to credit limits. Please try again later! 🤖";
+      } else if (errorStr.includes('configured') || errorStr.includes('Backend connection')) {
+        userMessage = "I'm not properly connected to my backend right now. This should resolve automatically. 🔧";
+      } else if (errorStr.includes('Rate limited')) {
+        userMessage = "I'm getting too many requests right now. Please wait a moment and try again! ⏳";
+      }
+      
       setChatMessages(prev => 
         prev.map(msg => 
           msg.id === messageId 
-            ? { ...msg, content: roverError || "I'm having trouble processing that request right now, but I'm still here to help! Could you try rephrasing your question? 🤖" }
+            ? { ...msg, content: userMessage }
             : msg
         )
       );
