@@ -181,186 +181,188 @@ const DiscordSidebar = ({
         </div>
       </div>
 
-      {/* Channel List */}
-      <div className="flex-1 flex flex-col min-w-0" style={{ backgroundColor: 'hsl(var(--discord-bg-secondary))' }}>
-        <div className="h-12 flex items-center px-4 flex-shrink-0 shadow-sm" style={{ borderBottom: '1px solid hsl(var(--discord-bg-quaternary))' }}>
-          <span className="font-semibold truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>
-            {isDMView ? "Direct Messages" : getCurrentServerName()}
-          </span>
-        </div>
-        
-        <ScrollArea className="flex-1">
-          {isDMView ? (
-            /* Direct Messages View */
-            <div className="p-2">
-              <div className="flex items-center justify-between px-2 py-1 text-xs uppercase font-semibold" style={{ color: 'hsl(var(--discord-text-muted))' }}>
-                <span className="truncate">Direct Messages</span>
-                <span className="text-lg cursor-pointer flex-shrink-0 hover:text-white transition-colors">+</span>
+      {/* Channel List - Hidden when in Discover view */}
+      {!isDiscoverView && (
+        <div className="flex-1 flex flex-col min-w-0" style={{ backgroundColor: 'hsl(var(--discord-bg-secondary))' }}>
+          <div className="h-12 flex items-center px-4 flex-shrink-0 shadow-sm" style={{ borderBottom: '1px solid hsl(var(--discord-bg-quaternary))' }}>
+            <span className="font-semibold truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>
+              {isDMView ? "Direct Messages" : getCurrentServerName()}
+            </span>
+          </div>
+          
+          <ScrollArea className="flex-1">
+            {isDMView ? (
+              /* Direct Messages View */
+              <div className="p-2">
+                <div className="flex items-center justify-between px-2 py-1 text-xs uppercase font-semibold" style={{ color: 'hsl(var(--discord-text-muted))' }}>
+                  <span className="truncate">Direct Messages</span>
+                  <span className="text-lg cursor-pointer flex-shrink-0 hover:text-white transition-colors">+</span>
+                </div>
+                
+                {dmChannels.map((channel) => (
+                    <div
+                    key={channel.id}
+                    className={`flex items-center px-2 py-1.5 mx-2 rounded cursor-pointer transition-colors ${
+                      isChannelActive(channel.id, 'dm') ? "" : ""
+                    }`}
+                    style={{ 
+                      backgroundColor: isChannelActive(channel.id, 'dm') ? 'hsl(var(--discord-bg-quaternary))' : 'transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isChannelActive(channel.id, 'dm')) {
+                        e.currentTarget.style.backgroundColor = 'hsl(var(--discord-bg-tertiary))';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isChannelActive(channel.id, 'dm')) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                    onClick={() => channel.id !== "search" && channel.id !== "tickets" && channel.id !== "group1" && onDMClick(channel.id)}
+                  >
+                    <div className="w-8 h-8 mr-3 flex-shrink-0">
+                      {channel.name === "Midjourney Bot" ? (
+                        <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Midjourney" className="w-8 h-8 rounded-full" />
+                      ) : channel.avatar ? (
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={channel.avatar} alt={channel.name} />
+                          <AvatarFallback className="bg-gray-600 text-gray-300 text-sm">
+                            {channel.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                          <Bot className="w-4 h-4 text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>{channel.name}</div>
+                      {channel.members && (
+                        <div className="text-gray-500 text-xs truncate">{channel.members}</div>
+                      )}
+                    </div>
+                    {channel.status === "online" && (
+                      <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                    )}
+                  </div>
+                ))}
               </div>
-              
-              {dmChannels.map((channel) => (
-                  <div
-                  key={channel.id}
-                  className={`flex items-center px-2 py-1.5 mx-2 rounded cursor-pointer transition-colors ${
-                    isChannelActive(channel.id, 'dm') ? "" : ""
-                  }`}
-                  style={{ 
-                    backgroundColor: isChannelActive(channel.id, 'dm') ? 'hsl(var(--discord-bg-quaternary))' : 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isChannelActive(channel.id, 'dm')) {
-                      e.currentTarget.style.backgroundColor = 'hsl(var(--discord-bg-tertiary))';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isChannelActive(channel.id, 'dm')) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }
-                  }}
-                  onClick={() => channel.id !== "search" && channel.id !== "tickets" && channel.id !== "group1" && onDMClick(channel.id)}
-                >
-                  <div className="w-8 h-8 mr-3 flex-shrink-0">
-                    {channel.name === "Midjourney Bot" ? (
-                      <img src="/lovable-uploads/ca8cef9f-1434-48e7-a22c-29adeb14325a.png" alt="Midjourney" className="w-8 h-8 rounded-full" />
-                    ) : channel.avatar ? (
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={channel.avatar} alt={channel.name} />
-                        <AvatarFallback className="bg-gray-600 text-gray-300 text-sm">
-                          {channel.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+            ) : (
+              /* Server Channels View */
+              <>
+                {/* Text Channels */}
+                <div className="p-2">
+                  <div 
+                    className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+                    onClick={() => toggleGroup("text")}
+                  >
+                    {expandedGroups.includes("text") ? (
+                      <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-gray-300" />
-                      </div>
+                      <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
                     )}
+                    <span className="truncate">Text Channels</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>{channel.name}</div>
-                    {channel.members && (
-                      <div className="text-gray-500 text-xs truncate">{channel.members}</div>
-                    )}
-                  </div>
-                  {channel.status === "online" && (
-                    <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                  
+                  {expandedGroups.includes("text") && (
+                    <div className="ml-2">
+                      {getCurrentServer()?.textChannels.map((channel) => (
+                        <div
+                          key={channel.id}
+                          className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
+                            isChannelActive(channel.id, 'text') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                          }`}
+                          onClick={() => onChannelClick(channel.id)}
+                        >
+                          <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                          <span className="text-gray-300 text-sm truncate">{channel.name}</span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            /* Server Channels View */
-            <>
-              {/* Text Channels */}
-              <div className="p-2">
-                <div 
-                  className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
-                  onClick={() => toggleGroup("text")}
-                >
-                  {expandedGroups.includes("text") ? (
-                    <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
-                  )}
-                  <span className="truncate">Text Channels</span>
-                </div>
-                
-                {expandedGroups.includes("text") && (
-                  <div className="ml-2">
-                    {getCurrentServer()?.textChannels.map((channel) => (
-                      <div
-                        key={channel.id}
-                        className={`flex items-center px-2 py-1.5 rounded cursor-pointer transition-colors ${
-                          isChannelActive(channel.id, 'text') ? 'bg-gray-700' : 'hover:bg-gray-700'
-                        }`}
-                        onClick={() => onChannelClick(channel.id)}
-                      >
-                        <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-                        <span className="text-gray-300 text-sm truncate">{channel.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
 
-              {/* Voice Channels */}
-              <div className="p-2">
-                <div 
-                  className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
-                  onClick={() => toggleGroup("voice")}
-                >
-                  {expandedGroups.includes("voice") ? (
-                    <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
-                  )}
-                  <span className="truncate">Voice Channels</span>
-                </div>
-                
-                {expandedGroups.includes("voice") && (
-                  <div className="ml-2">
-                    {getCurrentServer()?.voiceChannels.map((channel, index) => {
-                      const avatars = getUserAvatars();
-                      return (
-                        <div key={index} className="mb-1">
-                          <div className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700">
-                            <Volume2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-                            <span className="text-gray-300 text-sm flex-1 truncate">{channel.name}</span>
-                            {channel.users > 0 && (
-                              <span className="text-gray-500 text-xs flex-shrink-0">{channel.users}</span>
+                {/* Voice Channels */}
+                <div className="p-2">
+                  <div 
+                    className="flex items-center px-2 py-1 text-gray-400 text-xs uppercase font-semibold cursor-pointer hover:text-gray-300"
+                    onClick={() => toggleGroup("voice")}
+                  >
+                    {expandedGroups.includes("voice") ? (
+                      <ChevronDown className="w-3 h-3 mr-1 flex-shrink-0" />
+                    ) : (
+                      <ChevronRight className="w-3 h-3 mr-1 flex-shrink-0" />
+                    )}
+                    <span className="truncate">Voice Channels</span>
+                  </div>
+                  
+                  {expandedGroups.includes("voice") && (
+                    <div className="ml-2">
+                      {getCurrentServer()?.voiceChannels.map((channel, index) => {
+                        const avatars = getUserAvatars();
+                        return (
+                          <div key={index} className="mb-1">
+                            <div className="flex items-center px-2 py-1.5 rounded cursor-pointer hover:bg-gray-700">
+                              <Volume2 className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                              <span className="text-gray-300 text-sm flex-1 truncate">{channel.name}</span>
+                              {channel.users > 0 && (
+                                <span className="text-gray-500 text-xs flex-shrink-0">{channel.users}</span>
+                              )}
+                            </div>
+                            
+                            {/* Show users in voice channel */}
+                            {channel.userList && channel.userList.length > 0 && (
+                              <div className="ml-6 space-y-1">
+                                {channel.userList.map((user, userIndex) => (
+                                  <div key={userIndex} className="flex items-center px-2 py-1 text-gray-400 text-xs">
+                                    <Avatar className="w-4 h-4 mr-2 flex-shrink-0">
+                                      <AvatarImage src={avatars[userIndex % avatars.length]} alt={user} />
+                                      <AvatarFallback className="bg-gray-600 text-white text-xs font-bold">
+                                        {user.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="truncate">{user}</span>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
-                          
-                          {/* Show users in voice channel */}
-                          {channel.userList && channel.userList.length > 0 && (
-                            <div className="ml-6 space-y-1">
-                              {channel.userList.map((user, userIndex) => (
-                                <div key={userIndex} className="flex items-center px-2 py-1 text-gray-400 text-xs">
-                                  <Avatar className="w-4 h-4 mr-2 flex-shrink-0">
-                                    <AvatarImage src={avatars[userIndex % avatars.length]} alt={user} />
-                                    <AvatarFallback className="bg-gray-600 text-white text-xs font-bold">
-                                      {user.charAt(0)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="truncate">{user}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </ScrollArea>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </ScrollArea>
 
-        {/* User Panel */}
-        <div className="h-14 flex items-center px-2 flex-shrink-0" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))' }}>
-          <Avatar className="w-8 h-8 mr-2 flex-shrink-0">
-            <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="User" />
-            <AvatarFallback className="bg-indigo-600 text-white text-sm font-bold">
-              U
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>User</div>
-            <div className="text-xs truncate" style={{ color: 'hsl(var(--discord-text-muted))' }}>#1234</div>
-          </div>
-          <div className="flex space-x-1 flex-shrink-0">
-            <button className="p-1 rounded hover:bg-black/20 transition-colors">
-              <Mic className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
-            </button>
-            <button className="p-1 rounded hover:bg-black/20 transition-colors">
-              <Headphones className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
-            </button>
-            <button className="p-1 rounded hover:bg-black/20 transition-colors">
-              <Settings className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
-            </button>
+          {/* User Panel */}
+          <div className="h-14 flex items-center px-2 flex-shrink-0" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))' }}>
+            <Avatar className="w-8 h-8 mr-2 flex-shrink-0">
+              <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="User" />
+              <AvatarFallback className="bg-indigo-600 text-white text-sm font-bold">
+                U
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate" style={{ color: 'hsl(var(--discord-text-normal))' }}>User</div>
+              <div className="text-xs truncate" style={{ color: 'hsl(var(--discord-text-muted))' }}>#1234</div>
+            </div>
+            <div className="flex space-x-1 flex-shrink-0">
+              <button className="p-1 rounded hover:bg-black/20 transition-colors">
+                <Mic className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
+              </button>
+              <button className="p-1 rounded hover:bg-black/20 transition-colors">
+                <Headphones className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
+              </button>
+              <button className="p-1 rounded hover:bg-black/20 transition-colors">
+                <Settings className="w-4 h-4" style={{ color: 'hsl(var(--discord-interactive-normal))' }} />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
