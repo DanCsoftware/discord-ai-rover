@@ -5,6 +5,7 @@ import { discordApps, appCategories } from "@/data/appsData";
 import DiscordDiscoverSidebar from "./DiscordDiscoverSidebar";
 import DiscoverServerCard from "./DiscoverServerCard";
 import DiscoverAppCard from "./DiscoverAppCard";
+import DiscoveryRoverOverlay from "./DiscoveryRoverOverlay";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DiscordDiscoveryProps {
@@ -438,6 +439,9 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
           )}
         </ScrollArea>
       </div>
+      
+      {/* ROVER Discovery Overlay */}
+      <DiscoveryRoverOverlay onServerClick={onServerClick} />
     </div>
   );
 };

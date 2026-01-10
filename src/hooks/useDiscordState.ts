@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { servers, dmUsers, dmMessages, User, Message } from '@/data/discordData';
+import { useState, useMemo } from 'react';
+import { servers, dmUsers, dmMessages, User, Message, currentUserMemberships } from '@/data/discordData';
 
 export const useDiscordState = () => {
   const [activeChannel, setActiveChannel] = useState<string>('official-links');
@@ -16,6 +16,18 @@ export const useDiscordState = () => {
     aboutMe: 'Official Midjourney Discord Server',
     createdOn: 'Jan 29, 2022'
   });
+
+  // Determine if current user is admin/owner of the active server
+  const isCurrentServerAdmin = useMemo(() => {
+    const membership = currentUserMemberships.find(m => m.serverId === activeServer);
+    return membership?.role === 'admin' || membership?.role === 'owner';
+  }, [activeServer]);
+
+  // Get current user's role for active server
+  const currentServerRole = useMemo(() => {
+    const membership = currentUserMemberships.find(m => m.serverId === activeServer);
+    return membership?.role || 'member';
+  }, [activeServer]);
 
   const switchToChannel = (channelId: string) => {
     const currentServer = servers.find(s => s.id === activeServer);
@@ -125,6 +137,8 @@ export const useDiscordState = () => {
     isDMView,
     isDiscoverView,
     activeServer,
+    isCurrentServerAdmin,
+    currentServerRole,
     switchToChannel,
     switchToDM,
     switchToDMView,
