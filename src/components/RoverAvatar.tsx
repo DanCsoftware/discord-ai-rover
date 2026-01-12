@@ -38,25 +38,38 @@ const RoverAvatar = ({
           isThinking && "animate-rover-pulse"
         )}
       >
-        {/* Custom ROVER Bot Icon - Discord Clyde-inspired */}
+        {/* Discord Clyde-style Robot Face */}
         <svg 
           viewBox="0 0 24 24" 
-          className="text-white"
+          fill="none"
           style={{ 
-            width: `${16 * iconScale[size]}px`, 
-            height: `${16 * iconScale[size]}px` 
+            width: `${18 * iconScale[size]}px`, 
+            height: `${18 * iconScale[size]}px` 
           }}
-          fill="currentColor"
         >
-          {/* Bot Face */}
-          <path d="M12 2C9.5 2 7.5 4 7.5 6.5V7H6.5C5.67 7 5 7.67 5 8.5V9.5C5 10.33 5.67 11 6.5 11H7.5V12C7.5 15.04 9.96 17.5 13 17.5H13.5V19H10.5V21H13.5H14.5H17.5V19H14.5V17.5H15C16.38 17.5 17.5 16.38 17.5 15V11H18.5C19.33 11 20 10.33 20 9.5V8.5C20 7.67 19.33 7 18.5 7H17.5V6.5C17.5 4 15.5 2 13 2H12Z" />
-          {/* Left Eye */}
-          <circle cx="10" cy="10" r="1.5" fill="#1a1a2e" />
-          {/* Right Eye */}
-          <circle cx="15" cy="10" r="1.5" fill="#1a1a2e" />
-          {/* Antenna */}
-          <circle cx="12.5" cy="3.5" r="1" fill="currentColor" />
-          <line x1="12.5" y1="4.5" x2="12.5" y2="6" stroke="currentColor" strokeWidth="1.5" />
+          {/* Main head shape */}
+          <path 
+            d="M12 4C7.5 4 5 6.5 5 10C5 12.5 6 14 7.5 15C7.5 15.8 8 17 12 17C16 17 16.5 15.8 16.5 15C18 14 19 12.5 19 10C19 6.5 16.5 4 12 4Z"
+            fill="white"
+          />
+          {/* Left ear */}
+          <path 
+            d="M5 10C3.5 10 3 9 3 8C3 7 3.5 6.5 5 7"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          {/* Right ear */}
+          <path 
+            d="M19 10C20.5 10 21 9 21 8C21 7 20.5 6.5 19 7"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          {/* Left eye */}
+          <circle cx="9" cy="10" r="1.8" fill="#36393f"/>
+          {/* Right eye */}
+          <circle cx="15" cy="10" r="1.8" fill="#36393f"/>
         </svg>
       </div>
 
