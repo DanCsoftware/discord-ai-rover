@@ -2553,7 +2553,111 @@ export const dmMessages: Record<string, Message[]> = {
   ]
 };
 
+// Define which servers the user has already joined (IDs 2-9)
+export const userJoinedServerIds: number[] = [2, 3, 4, 5, 6, 7, 8, 9];
+
+// New discoverable servers that user has NOT joined (IDs 10-17)
+export const discoverableServers = [
+  {
+    id: 10,
+    name: "Anime Paradise",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #ff6b9d 0%, #c44569 50%, #8b2145 100%)",
+      text: "🌸",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 11,
+    name: "Indie Game Dev Hub",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #6c5ce7 0%, #4834d4 50%, #2d1b69 100%)",
+      text: "🎮",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 12,
+    name: "Lofi Beats Central",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #a29bfe 0%, #6c5ce7 50%, #341f97 100%)",
+      text: "🎧",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 13,
+    name: "Esports Arena",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #ff4757 0%, #c92a2a 50%, #861414 100%)",
+      text: "🏆",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 14,
+    name: "Book Worms Club",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #2ed573 0%, #17a058 50%, #0b5a31 100%)",
+      text: "📚",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 15,
+    name: "Fitness Warriors",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #ff9f43 0%, #e67e22 50%, #a55000 100%)",
+      text: "💪",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 16,
+    name: "Photography Collective",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #00cec9 0%, #009688 50%, #00574b 100%)",
+      text: "📷",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 17,
+    name: "Language Learners",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #fdcb6e 0%, #f39c12 50%, #b36100 100%)",
+      text: "🌍",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  }
+];
+
 export const serverDiscoveryData: Record<number, ServerDiscoveryMeta> = {
+  // Already joined servers
   2: {
     bannerImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&h=300&fit=crop",
     description: "The ultimate gaming community. Find teams, discuss strategies, share highlights, and compete in weekly tournaments!",
@@ -2609,5 +2713,174 @@ export const serverDiscoveryData: Record<number, ServerDiscoveryMeta> = {
     onlineCount: 234567,
     memberCount: 987654,
     isVerified: false
+  },
+  // NEW discoverable servers (not joined)
+  10: {
+    bannerImage: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&h=300&fit=crop",
+    description: "The ultimate anime haven! Watch parties, waifu wars, manga discussions, and a welcoming otaku family.",
+    onlineCount: 45678,
+    memberCount: 234567,
+    isVerified: true
+  },
+  11: {
+    bannerImage: "https://images.unsplash.com/photo-1556438064-2d7646166914?w=800&h=300&fit=crop",
+    description: "Build your dream games with fellow indie developers. Share progress, get feedback, and collaborate on projects.",
+    onlineCount: 12345,
+    memberCount: 89012,
+    isVerified: false
+  },
+  12: {
+    bannerImage: "https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=800&h=300&fit=crop",
+    description: "24/7 lofi hip hop radio and chill beats. Study, relax, or code to the perfect soundtrack.",
+    onlineCount: 78901,
+    memberCount: 345678,
+    isVerified: true
+  },
+  13: {
+    bannerImage: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=800&h=300&fit=crop",
+    description: "Competitive gaming at its finest. Weekly tournaments, pro coaching, and ranked team matchmaking.",
+    onlineCount: 156789,
+    memberCount: 678901,
+    isVerified: true
+  },
+  14: {
+    bannerImage: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=300&fit=crop",
+    description: "From classics to new releases - discuss, review, and share your reading journey with fellow book lovers.",
+    onlineCount: 23456,
+    memberCount: 156789,
+    isVerified: false
+  },
+  15: {
+    bannerImage: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=300&fit=crop",
+    description: "Crush your fitness goals with workout buddies, nutrition tips, and daily motivation from around the world.",
+    onlineCount: 34567,
+    memberCount: 189012,
+    isVerified: false
+  },
+  16: {
+    bannerImage: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&h=300&fit=crop",
+    description: "Capture the world through your lens. Photo critiques, editing tutorials, and inspiring visual stories.",
+    onlineCount: 19876,
+    memberCount: 123456,
+    isVerified: true
+  },
+  17: {
+    bannerImage: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&h=300&fit=crop",
+    description: "Learn any language with native speakers. Practice partners, study groups, and cultural exchange.",
+    onlineCount: 28901,
+    memberCount: 145678,
+    isVerified: false
+  }
+};
+
+// Extended server metadata for discovery recommendations
+export interface DiscoveryServerMeta {
+  category: string;
+  tags: string[];
+  activityLevel: 'low' | 'medium' | 'high' | 'very_high';
+  communityVibe: string;
+  whyJoin: string[];
+  primaryGames?: string[];
+  specialFeatures?: string[];
+}
+
+export const discoveryMetadata: Record<number, DiscoveryServerMeta> = {
+  // NEW servers metadata
+  10: {
+    category: 'Entertainment',
+    tags: ['anime', 'manga', 'otaku', 'japanese', 'animation'],
+    activityLevel: 'high',
+    communityVibe: 'Passionate and welcoming weeb community',
+    whyJoin: [
+      'Weekly anime watch parties with live chat',
+      'Seasonal anime discussion threads',
+      'Active manga trading and recommendations'
+    ],
+    specialFeatures: ['Watch Parties', 'Waifu Wars', 'Manga Club']
+  },
+  11: {
+    category: 'Technology',
+    tags: ['gamedev', 'indie', 'unity', 'godot', 'programming'],
+    activityLevel: 'medium',
+    communityVibe: 'Supportive indie developers helping each other',
+    whyJoin: [
+      'Get real feedback on your game prototypes',
+      'Find collaborators for your projects',
+      'Learn from experienced indie devs'
+    ],
+    specialFeatures: ['Dev Logs', 'Playtesting', 'Jam Teams']
+  },
+  12: {
+    category: 'Music',
+    tags: ['lofi', 'chill', 'study', 'beats', 'relaxation'],
+    activityLevel: 'high',
+    communityVibe: 'Chill vibes and good music 24/7',
+    whyJoin: [
+      'Perfect background music for work/study',
+      'Discover new underground lofi artists',
+      'Share your own beats and get feedback'
+    ],
+    specialFeatures: ['24/7 Radio', 'Producer Showcases', 'Chill Sessions']
+  },
+  13: {
+    category: 'Gaming',
+    tags: ['esports', 'competitive', 'tournaments', 'ranked', 'pro'],
+    activityLevel: 'very_high',
+    communityVibe: 'Competitive players pushing their limits',
+    whyJoin: [
+      'Weekly tournaments with cash prizes',
+      'Find skilled teammates for ranked',
+      'Get coached by semi-pro players'
+    ],
+    primaryGames: ['Valorant', 'League of Legends', 'CS2', 'Apex Legends'],
+    specialFeatures: ['Tournaments', 'Coaching', 'Scrim Finder']
+  },
+  14: {
+    category: 'Education',
+    tags: ['books', 'reading', 'literature', 'learning', 'discussion'],
+    activityLevel: 'medium',
+    communityVibe: 'Thoughtful readers sharing their journeys',
+    whyJoin: [
+      'Monthly book club with guided discussions',
+      'Diverse genres from fiction to self-help',
+      'Meet fellow readers who love the same books'
+    ],
+    specialFeatures: ['Book Club', 'Reading Challenges', 'Author AMAs']
+  },
+  15: {
+    category: 'Lifestyle',
+    tags: ['fitness', 'health', 'workout', 'nutrition', 'motivation'],
+    activityLevel: 'high',
+    communityVibe: 'Supportive fitness community for all levels',
+    whyJoin: [
+      'Daily workout check-ins for accountability',
+      'Expert nutrition and meal prep advice',
+      'Celebrate your fitness milestones together'
+    ],
+    specialFeatures: ['Progress Tracking', 'Workout Buddies', 'Challenges']
+  },
+  16: {
+    category: 'Creative',
+    tags: ['photography', 'camera', 'editing', 'visual', 'art'],
+    activityLevel: 'medium',
+    communityVibe: 'Visual artists capturing beautiful moments',
+    whyJoin: [
+      'Get constructive feedback on your photos',
+      'Learn editing techniques from pros',
+      'Weekly photo challenges to improve'
+    ],
+    specialFeatures: ['Photo Critiques', 'Editing Tutorials', 'Gear Talk']
+  },
+  17: {
+    category: 'Education',
+    tags: ['language', 'learning', 'exchange', 'culture', 'practice'],
+    activityLevel: 'high',
+    communityVibe: 'Language learners helping each other succeed',
+    whyJoin: [
+      'Practice with native speakers daily',
+      'Voice channels for speaking practice',
+      'Study groups for 20+ languages'
+    ],
+    specialFeatures: ['Tandem Partners', 'Voice Practice', 'Cultural Exchange']
   }
 };

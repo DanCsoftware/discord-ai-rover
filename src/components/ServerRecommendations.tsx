@@ -69,14 +69,18 @@ export const ServerRecommendations: React.FC<ServerRecommendationsProps> = ({
                     </Badge>
                   </CardTitle>
                   <div className="flex items-center gap-4 mt-2 text-sm text-discord-muted">
-                    <div className="flex items-center gap-1">
-                      <Hash className="w-4 h-4" />
-                      {rec.server.textChannels.length} channels
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {rec.server.voiceChannels.length} voice
-                    </div>
+                    {'textChannels' in rec.server && (
+                      <div className="flex items-center gap-1">
+                        <Hash className="w-4 h-4" />
+                        {rec.server.textChannels.length} channels
+                      </div>
+                    )}
+                    {'voiceChannels' in rec.server && (
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        {rec.server.voiceChannels.length} voice
+                      </div>
+                    )}
                     <div className="flex items-center gap-1">
                       <Activity className={`w-4 h-4 ${getActivityColor(rec.memberActivity)}`} />
                       {getActivityIcon(rec.memberActivity)} {rec.memberActivity.replace('_', ' ')} activity

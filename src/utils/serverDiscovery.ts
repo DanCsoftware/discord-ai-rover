@@ -1,8 +1,8 @@
-import { servers, Server } from '@/data/discordData';
+import { servers, Server, discoverableServers, discoveryMetadata, userJoinedServerIds, serverDiscoveryData } from '@/data/discordData';
 import { SearchResult } from './searchEngine';
 
 export interface ServerRecommendation {
-  server: Server;
+  server: Server | { id: number; name: string; icon: string; iconStyle?: any };
   matchScore: number;
   matchReasons: string[];
   category: string;
@@ -10,6 +10,7 @@ export interface ServerRecommendation {
   communityVibe: string;
   primaryGames?: string[];
   specialFeatures?: string[];
+  whyJoin?: string[];
 }
 
 export interface UserProfile {
@@ -410,6 +411,129 @@ export class ServerDiscoveryEngine {
     response += `💡 **Need more help?** Ask me to "find [specific game] servers" or "recommend [competitive/casual] communities"!`;
 
     return response;
+  }
+
+  // NEW: Get recommendations for discovery page (excludes joined servers)
+  getDiscoveryRecommendations(query?: string): ServerRecommendation[] {
+    const recommendations: ServerRecommendation[] = [];
+    
+    // Use discoverable servers (not joined by user)
+    discoverableServers.forEach(server => {
+      const meta = discoveryMetadata[server.id];
+      if (!meta) return;
+      
+      let matchScore = 0.5; // Base score
+      const matchReasons: string[] = [];
+      
+      if (query) {
+        const lowerQuery = query.toLowerCase();
+        
+        // Check category match
+        if (meta.category.toLowerCase().includes(lowerQuery)) {
+          matchScore += 0.2;
+          matchReasons.push(`Matches your interest in ${meta.category}`);
+        }
+        
+        // Check tags
+        const matchingTags = meta.tags.filter(tag => 
+          tag.includes(lowerQuery) || lowerQuery.includes(tag)
+        );
+        if (matchingTags.length > 0) {
+          matchScore += 0.15 * Math.min(matchingTags.length, 3);
+          matchReasons.push(`Related to ${matchingTags.slice(0, 2).join(', ')}`);
+        }
+        
+        // Check name
+        if (server.name.toLowerCase().includes(lowerQuery)) {
+          matchScore += 0.25;
+          matchReasons.push('Direct match for your search');
+        }
+        
+        // Activity keywords
+        if (lowerQuery.includes('active') && ['high', 'very_high'].includes(meta.activityLevel)) {
+          matchScore += 0.15;
+          matchReasons.push('Very active community');
+        }
+        
+        if (lowerQuery.includes('chill') && ['low', 'medium'].includes(meta.activityLevel)) {
+          matchScore += 0.15;
+          matchReasons.push('Relaxed community pace');
+        }
+        
+        // Game-related
+        if (lowerQuery.includes('gaming') || lowerQuery.includes('game')) {
+          if (meta.category === 'Gaming' || meta.tags.includes('gamedev')) {
+            matchScore += 0.2;
+            matchReasons.push('Gaming-focused community');
+          }
+        }
+        
+        // Creative
+        if (lowerQuery.includes('art') || lowerQuery.includes('creative')) {
+          if (meta.category === 'Creative' || meta.tags.some(t => ['art', 'creative', 'photography'].includes(t))) {
+            matchScore += 0.2;
+            matchReasons.push('Creative community for artists');
+          }
+        }
+        
+        // Music
+        if (lowerQuery.includes('music')) {
+          if (meta.category === 'Music' || meta.tags.includes('lofi')) {
+            matchScore += 0.2;
+            matchReasons.push('Music-loving community');
+          }
+        }
+        
+        // Anime
+        if (lowerQuery.includes('anime')) {
+          if (meta.tags.includes('anime') || meta.tags.includes('manga')) {
+            matchScore += 0.3;
+            matchReasons.push('Perfect for anime fans');
+          }
+        }
+        
+        // Learning/Education
+        if (lowerQuery.includes('learn') || lowerQuery.includes('education')) {
+          if (meta.category === 'Education' || meta.tags.includes('learning')) {
+            matchScore += 0.2;
+            matchReasons.push('Great for learning and growth');
+          }
+        }
+      } else {
+        // No query - provide general reasons
+        if (meta.activityLevel === 'very_high') {
+          matchScore += 0.2;
+          matchReasons.push('Very active community');
+        }
+        matchReasons.push(meta.communityVibe);
+      }
+      
+      // Add some randomness for variety
+      matchScore += Math.random() * 0.1;
+      matchScore = Math.min(matchScore, 1.0);
+      
+      if (matchReasons.length === 0) {
+        matchReasons.push(meta.communityVibe);
+      }
+      
+      recommendations.push({
+        server,
+        matchScore,
+        matchReasons,
+        category: meta.category,
+        memberActivity: meta.activityLevel,
+        communityVibe: meta.communityVibe,
+        specialFeatures: meta.specialFeatures,
+        whyJoin: meta.whyJoin
+      });
+    });
+    
+    return recommendations.sort((a, b) => b.matchScore - a.matchScore);
+  }
+
+  // Get all discoverable server IDs
+  getDiscoverableServerIds(): number[] {
+    return discoverableServers.map(s => s.id);
   }
 }
 
