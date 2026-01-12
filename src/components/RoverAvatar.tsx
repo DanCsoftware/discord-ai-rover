@@ -31,7 +31,7 @@ const RoverAvatar = ({
         )}
       >
         <img 
-          src="/lovable-uploads/8946501d-dd9e-4358-be97-8ba3df21de53.png"
+          src="/lovable-uploads/discord-new-logo-2.webp"
           alt="ROVER"
           className="w-full h-full object-cover"
         />

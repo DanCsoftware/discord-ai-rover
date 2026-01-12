@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bot, Sparkles } from 'lucide-react';
+import RoverAvatar from './RoverAvatar';
 import { queryProcessor, SearchResponse } from '@/utils/queryProcessor';
 import { moderationEngine } from '@/utils/moderationEngine';
 import { parseSummaryRequest, generateSummary, filterMessagesByTime, filterMessagesByUser } from '@/utils/conversationAnalyzer';
@@ -456,13 +456,7 @@ export const AIAssistant = ({ message, onResponse }: AIAssistantProps) => {
 
   return (
     <div className="flex items-start space-x-3 opacity-80">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-        {isProcessing ? (
-          <Sparkles className="w-4 h-4 text-white animate-pulse" />
-        ) : (
-          <Bot className="w-4 h-4 text-white" />
-        )}
-      </div>
+      <RoverAvatar size="sm" isThinking={isProcessing} showVerified={true} />
       <div className="flex-1">
         <div className="flex items-center space-x-2 mb-1">
           <span className="text-white font-medium">ROVER</span>
