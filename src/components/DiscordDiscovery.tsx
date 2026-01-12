@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { Search, Sparkles, Bot, ArrowRight, Loader2 } from "lucide-react";
-import { servers, serverDiscoveryData } from "@/data/discordData";
+import { useState, useEffect } from "react";
+import { Search, Sparkles, Bot, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { servers, serverDiscoveryData, discoverableServers, discoveryMetadata, userJoinedServerIds } from "@/data/discordData";
 import { discordApps, appCategories } from "@/data/appsData";
 import DiscordDiscoverSidebar from "./DiscordDiscoverSidebar";
 import DiscoverServerCard from "./DiscoverServerCard";
 import DiscoverAppCard from "./DiscoverAppCard";
+import RoverRecommendationCard from "./RoverRecommendationCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRoverChat } from "@/hooks/useRoverChat";
+import { serverDiscovery, ServerRecommendation } from "@/utils/serverDiscovery";
 
 interface DiscordDiscoveryProps {
   onServerClick: (serverId: number) => void;
@@ -18,43 +20,47 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
   const [activeAppCategory, setActiveAppCategory] = useState<string>('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [roverQuery, setRoverQuery] = useState('');
-  const [roverRecommendation, setRoverRecommendation] = useState('');
-  const [highlightedServers, setHighlightedServers] = useState<number[]>([]);
+  const [roverAcknowledgment, setRoverAcknowledgment] = useState('');
+  const [recommendations, setRecommendations] = useState<ServerRecommendation[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   
   const { streamingResponse, isStreaming, sendMessage } = useRoverChat();
 
-  const interestTags = ['Gaming', 'Music', 'Art', 'Tech', 'Crypto', 'Anime', 'Social', 'Learning'];
+  const interestTags = ['Gaming', 'Music', 'Art', 'Tech', 'Anime', 'Fitness', 'Learning', 'Creative'];
+
+  // Load initial recommendations on mount
+  useEffect(() => {
+    const initialRecs = serverDiscovery.getDiscoveryRecommendations();
+    setRecommendations(initialRecs);
+  }, []);
 
   const handleRoverSearch = async (query: string) => {
     if (!query.trim()) return;
     
-    setRoverRecommendation('');
-    setHighlightedServers([]);
+    setHasSearched(true);
+    setRoverAcknowledgment('');
+    
+    // Get recommendations based on query
+    const recs = serverDiscovery.getDiscoveryRecommendations(query);
+    setRecommendations(recs);
     
     try {
+      // Get a brief acknowledgment from AI
       const response = await sendMessage(
-        `I'm looking for Discord communities. Help me find: ${query}. Based on available servers, recommend the best matches and explain why.`,
+        `User is looking for Discord communities about: "${query}". Give a brief, friendly 1-2 sentence acknowledgment about what you found. Don't list servers, just acknowledge their interest. Keep it under 30 words.`,
         { channelName: 'discovery', serverName: 'Discovery', messages: [] }
       );
       
-      setRoverRecommendation(response);
-      
-      // Highlight matching servers based on keywords
-      const queryLower = query.toLowerCase();
-      const matches = servers.filter(s => {
-        const meta = serverDiscoveryData[s.id];
-        const searchText = `${s.name} ${meta?.description || ''}`.toLowerCase();
-        return queryLower.split(' ').some(word => word.length > 2 && searchText.includes(word));
-      });
-      setHighlightedServers(matches.map(s => s.id));
+      setRoverAcknowledgment(response);
     } catch (e) {
       console.error('ROVER search error:', e);
+      setRoverAcknowledgment(`Found ${recs.length} communities for "${query}"! Check them out below.`);
     }
   };
 
   const handleTagClick = (tag: string) => {
     setRoverQuery(tag);
-    handleRoverSearch(`${tag} communities with active members`);
+    handleRoverSearch(tag);
   };
 
   const serverCategories = [
@@ -67,7 +73,6 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
     { id: 'student', label: 'Student Hubs' },
   ];
 
-  // Get current categories based on active tab
   const getCurrentCategories = () => {
     if (activeTab === 'servers') return serverCategories;
     if (activeTab === 'apps') return appCategories;
@@ -90,8 +95,10 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
     return categoryMap[serverId] || [];
   };
 
-  const filteredServers = servers.filter(server => {
-    // Filter by search query
+  // Filter servers user has already joined (for "Featured" section)
+  const joinedServers = servers.filter(server => userJoinedServerIds.includes(server.id));
+  
+  const filteredJoinedServers = joinedServers.filter(server => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       if (!server.name.toLowerCase().includes(query)) {
@@ -99,7 +106,6 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
       }
     }
     
-    // Filter by category
     if (activeCategory !== 'home') {
       const serverCats = getCategoryForServer(server.id);
       if (!serverCats.includes(activeCategory)) {
@@ -128,7 +134,6 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
   });
 
   const promotedApps = discordApps.filter(app => app.isPromoted);
-  const puzzleGames = discordApps.filter(app => app.category === 'games' && !app.isPromoted);
 
   return (
     <div className="flex h-full" style={{ backgroundColor: 'hsl(var(--discord-bg-primary))' }}>
@@ -137,7 +142,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Category Navigation - Only show for Apps and Servers */}
+        {/* Category Navigation */}
         {activeTab !== 'quests' && (
           <div 
             className="flex items-center justify-between px-6 py-3 flex-shrink-0"
@@ -218,45 +223,45 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
         <ScrollArea className="flex-1">
           {activeTab === 'servers' && (
             <div className="p-6">
-              {/* Interactive ROVER Discovery Banner */}
+              {/* Compact ROVER Discovery Banner */}
               <div 
                 className="relative rounded-xl overflow-hidden mb-8"
                 style={{
                   background: 'linear-gradient(135deg, #5865f2 0%, #3b44c4 40%, #1e1f22 100%)',
                 }}
               >
-                <div className="p-8 pb-6">
+                <div className="p-6">
                   <div className="flex items-start gap-4">
                     {/* ROVER Avatar */}
                     <div 
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
                       style={{ 
                         background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%)',
-                        boxShadow: '0 0 30px rgba(139, 92, 246, 0.4)'
+                        boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)'
                       }}
                     >
-                      <Bot className="w-7 h-7 text-white" />
+                      <Bot className="w-6 h-6 text-white" />
                     </div>
                     
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h1 className="text-2xl font-bold" style={{ color: 'white' }}>
-                          Hey! I'm ROVER
+                      <div className="flex items-center gap-2 mb-1">
+                        <h1 className="text-xl font-bold" style={{ color: 'white' }}>
+                          Find your community
                         </h1>
-                        <Sparkles className="w-5 h-5 text-yellow-300" />
+                        <Sparkles className="w-4 h-4 text-yellow-300" />
                       </div>
-                      <p className="text-base mb-4" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                        Tell me what you're into, and I'll find your perfect community.
+                      <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                        Tell ROVER what you're into
                       </p>
                       
                       {/* Interest Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {interestTags.map(tag => (
                           <button
                             key={tag}
                             onClick={() => handleTagClick(tag)}
                             disabled={isStreaming}
-                            className="px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:scale-105 disabled:opacity-50"
+                            className="px-3 py-1 rounded-full text-xs font-medium transition-all hover:scale-105 disabled:opacity-50"
                             style={{ 
                               backgroundColor: 'rgba(255,255,255,0.15)',
                               color: 'white',
@@ -268,30 +273,29 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                         ))}
                       </div>
                       
-                      {/* Natural Language Search */}
+                      {/* Search Input */}
                       <div className="flex items-center gap-2">
                         <div 
-                          className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl"
+                          className="flex-1 flex items-center gap-3 px-4 py-2.5 rounded-lg"
                           style={{ 
                             backgroundColor: 'rgba(0,0,0,0.3)',
                             border: '1px solid rgba(255,255,255,0.1)'
                           }}
                         >
-                          <Bot className="w-5 h-5 text-purple-300 flex-shrink-0" />
                           <input
                             type="text"
                             value={roverQuery}
                             onChange={(e) => setRoverQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleRoverSearch(roverQuery)}
-                            placeholder="Describe your ideal community..."
+                            placeholder="I want to find communities about..."
                             disabled={isStreaming}
-                            className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/50"
+                            className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder:text-white/50"
                           />
                         </div>
                         <button
                           onClick={() => handleRoverSearch(roverQuery)}
                           disabled={isStreaming || !roverQuery.trim()}
-                          className="px-5 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
+                          className="px-4 py-2.5 rounded-lg font-semibold text-sm transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
                           style={{ 
                             backgroundColor: 'white',
                             color: '#5865f2'
@@ -311,78 +315,102 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                   </div>
                 </div>
                 
-                {/* ROVER Response Section */}
-                {(streamingResponse || roverRecommendation) && (
+                {/* Brief Acknowledgment (not long text) */}
+                {(hasSearched && (streamingResponse || roverAcknowledgment)) && (
                   <div 
-                    className="px-8 py-4"
+                    className="px-6 py-3 flex items-center gap-3"
                     style={{ 
-                      backgroundColor: 'rgba(0,0,0,0.3)',
+                      backgroundColor: 'rgba(0,0,0,0.25)',
                       borderTop: '1px solid rgba(255,255,255,0.1)'
                     }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div 
-                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)' }}
-                      >
-                        <Sparkles className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                          ROVER's Recommendations
-                        </p>
-                        <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                          {isStreaming ? streamingResponse : roverRecommendation}
-                          {isStreaming && <span className="animate-pulse">▋</span>}
-                        </p>
-                        {highlightedServers.length > 0 && !isStreaming && (
-                          <p className="text-xs mt-2" style={{ color: '#a78bfa' }}>
-                            ✨ {highlightedServers.length} matching communities highlighted below
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                      {isStreaming ? (
+                        <>
+                          {streamingResponse}
+                          <span className="animate-pulse">▋</span>
+                        </>
+                      ) : (
+                        roverAcknowledgment || `Found ${recommendations.length} communities for you!`
+                      )}
+                    </p>
                   </div>
                 )}
                 
                 {/* Decorative elements */}
                 <div 
-                  className="absolute top-4 right-8 w-32 h-32 rounded-full opacity-20 pointer-events-none"
+                  className="absolute top-2 right-6 w-24 h-24 rounded-full opacity-20 pointer-events-none"
                   style={{ background: 'radial-gradient(circle, #eb459e 0%, transparent 70%)' }}
-                />
-                <div 
-                  className="absolute bottom-4 right-32 w-20 h-20 rounded-full opacity-15 pointer-events-none"
-                  style={{ background: 'radial-gradient(circle, #57f287 0%, transparent 70%)' }}
                 />
               </div>
 
-              {/* Featured Servers Section */}
+              {/* ROVER Recommendations Section - NEW SERVERS */}
+              {recommendations.length > 0 && (
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="w-5 h-5" style={{ color: '#a78bfa' }} />
+                    <h2 
+                      className="text-lg font-bold"
+                      style={{ color: 'hsl(var(--discord-text-normal))' }}
+                    >
+                      {hasSearched ? 'Recommended for You' : 'Communities to Explore'}
+                    </h2>
+                    <span 
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: 'rgba(167, 139, 250, 0.2)', color: '#a78bfa' }}
+                    >
+                      {recommendations.length} new
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {recommendations.slice(0, 8).map((rec) => {
+                      const discoveryMeta = serverDiscoveryData[rec.server.id];
+                      const extendedMeta = discoveryMetadata[rec.server.id];
+                      if (!discoveryMeta) return null;
+                      
+                      return (
+                        <RoverRecommendationCard
+                          key={rec.server.id}
+                          server={rec.server}
+                          discoveryMeta={discoveryMeta}
+                          extendedMeta={extendedMeta}
+                          matchScore={rec.matchScore}
+                          matchReasons={rec.matchReasons}
+                          onExplore={() => {
+                            // For now, show a toast or handle join - could navigate to a preview
+                            console.log('Explore server:', rec.server.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Your Servers Section */}
               <div className="mb-6">
                 <h2 
                   className="text-lg font-bold mb-4"
                   style={{ color: 'hsl(var(--discord-text-normal))' }}
                 >
-                  {activeCategory === 'home' ? 'Featured Communities' : serverCategories.find(c => c.id === activeCategory)?.label}
+                  {activeCategory === 'home' ? 'Your Communities' : serverCategories.find(c => c.id === activeCategory)?.label}
                 </h2>
 
-                {filteredServers.length > 0 ? (
+                {filteredJoinedServers.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {filteredServers.map((server) => {
+                    {filteredJoinedServers.map((server) => {
                       const discoveryMeta = serverDiscoveryData[server.id];
                       if (!discoveryMeta) return null;
-                      const isHighlighted = highlightedServers.includes(server.id);
                       
                       return (
-                        <div
+                        <DiscoverServerCard
                           key={server.id}
-                          className={`transition-all ${isHighlighted ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-transparent rounded-xl scale-[1.02]' : ''}`}
-                        >
-                          <DiscoverServerCard
-                            server={server}
-                            discoveryMeta={discoveryMeta}
-                            onClick={() => onServerClick(server.id)}
-                          />
-                        </div>
+                          server={server}
+                          discoveryMeta={discoveryMeta}
+                          onClick={() => onServerClick(server.id)}
+                        />
                       );
                     })}
                   </div>
@@ -425,163 +453,104 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                 
                 {/* Decorative elements */}
                 <div 
-                  className="absolute top-4 right-8 w-32 h-32 rounded-full opacity-20"
+                  className="absolute top-4 right-8 w-32 h-32 rounded-full opacity-30"
                   style={{ background: 'radial-gradient(circle, #fbbf24 0%, transparent 70%)' }}
                 />
                 <div 
-                  className="absolute bottom-4 right-32 w-20 h-20 rounded-full opacity-15"
-                  style={{ background: 'radial-gradient(circle, #22c55e 0%, transparent 70%)' }}
+                  className="absolute bottom-4 right-32 w-20 h-20 rounded-full opacity-20"
+                  style={{ background: 'radial-gradient(circle, #57f287 0%, transparent 70%)' }}
                 />
               </div>
 
-              {/* Promoted Games Section */}
-              {activeAppCategory === 'featured' && (
-                <>
-                  <div className="mb-6">
-                    <h2 
-                      className="text-lg font-bold mb-4"
-                      style={{ color: 'hsl(var(--discord-text-normal))' }}
-                    >
-                      Promoted Games
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {promotedApps.map((app) => (
-                        <DiscoverAppCard key={app.id} app={app} />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <h2 
-                      className="text-lg font-bold mb-4"
-                      style={{ color: 'hsl(var(--discord-text-normal))' }}
-                    >
-                      Puzzle Games
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {puzzleGames.slice(0, 4).map((app) => (
-                        <DiscoverAppCard key={app.id} app={app} />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Filtered Apps */}
-              {activeAppCategory !== 'featured' && (
-                <div className="mb-6">
+              {/* Promoted Apps Section */}
+              {promotedApps.length > 0 && (
+                <div className="mb-8">
                   <h2 
                     className="text-lg font-bold mb-4"
                     style={{ color: 'hsl(var(--discord-text-normal))' }}
                   >
-                    {appCategories.find(c => c.id === activeAppCategory)?.label || 'Apps'}
+                    Featured Apps
                   </h2>
-                  {filteredApps.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {filteredApps.map((app) => (
-                        <DiscoverAppCard key={app.id} app={app} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div 
-                      className="text-center py-12"
-                      style={{ color: 'hsl(var(--discord-text-muted))' }}
-                    >
-                      <p>No apps found in this category.</p>
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {promotedApps.map((app) => (
+                      <DiscoverAppCard key={app.id} app={app} />
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {/* All Apps Section */}
+              <div className="mb-6">
+                <h2 
+                  className="text-lg font-bold mb-4"
+                  style={{ color: 'hsl(var(--discord-text-normal))' }}
+                >
+                  {activeAppCategory === 'featured' ? 'All Apps' : appCategories.find(c => c.id === activeAppCategory)?.label}
+                </h2>
+
+                {filteredApps.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredApps.map((app) => (
+                      <DiscoverAppCard key={app.id} app={app} />
+                    ))}
+                  </div>
+                ) : (
+                  <div 
+                    className="text-center py-12"
+                    style={{ color: 'hsl(var(--discord-text-muted))' }}
+                  >
+                    <p>No apps found in this category.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {activeTab === 'quests' && (
             <div className="p-6">
-              {/* Hero Banner for Quests */}
+              {/* Quests Hero */}
               <div 
-                className="relative rounded-xl overflow-hidden mb-8"
+                className="relative rounded-xl overflow-hidden mb-8 p-8"
                 style={{
-                  background: 'linear-gradient(135deg, #7c3aed 0%, #5865f2 30%, #3b82f6 60%, #1e1f22 100%)',
-                  minHeight: '280px'
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 40%, #1e1f22 100%)',
+                  minHeight: '200px'
                 }}
               >
-                {/* Decorative stars */}
-                <div className="absolute inset-0 overflow-hidden">
-                  <div 
-                    className="absolute top-6 left-12 text-2xl opacity-60"
-                    style={{ color: '#fbbf24' }}
-                  >
-                    ✦
-                  </div>
-                  <div 
-                    className="absolute top-16 right-24 text-lg opacity-40"
-                    style={{ color: '#fbbf24' }}
-                  >
-                    ★
-                  </div>
-                  <div 
-                    className="absolute bottom-12 left-32 text-sm opacity-30"
-                    style={{ color: '#fbbf24' }}
-                  >
-                    ✦
-                  </div>
-                  <div 
-                    className="absolute top-24 left-1/3 text-xl opacity-50"
-                    style={{ color: '#a855f7' }}
-                  >
-                    ★
-                  </div>
-                  <div 
-                    className="absolute bottom-20 right-1/4 text-2xl opacity-40"
-                    style={{ color: '#60a5fa' }}
-                  >
-                    ✦
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10 flex flex-col items-center justify-center h-full py-12 px-8 text-center">
+                <div className="relative z-10 max-w-lg">
                   <h1 
-                    className="text-4xl font-bold mb-6 uppercase tracking-wide"
+                    className="text-3xl font-bold mb-3 uppercase tracking-wide"
                     style={{ color: 'white' }}
                   >
-                    Quests have moved!
+                    ⚔️ Quests
                   </h1>
-                  <button 
-                    className="px-6 py-3 rounded-md font-semibold text-sm transition-all hover:opacity-90"
-                    style={{ 
-                      backgroundColor: 'white', 
-                      color: '#1e1f22'
-                    }}
+                  <p 
+                    className="text-base opacity-90"
+                    style={{ color: 'rgba(255,255,255,0.8)' }}
                   >
-                    View Quests
-                  </button>
+                    Complete challenges, earn rewards, and unlock exclusive items across Discord.
+                  </p>
                 </div>
               </div>
 
-              {/* Info Section */}
-              <div className="text-center max-w-xl mx-auto">
-                <h2 
-                  className="text-xl font-bold mb-4"
+              {/* Quests Content */}
+              <div 
+                className="text-center py-16 rounded-xl"
+                style={{ backgroundColor: 'hsl(var(--discord-bg-secondary))' }}
+              >
+                <Sparkles className="w-12 h-12 mx-auto mb-4" style={{ color: '#fbbf24' }} />
+                <h3 
+                  className="text-xl font-bold mb-2"
                   style={{ color: 'hsl(var(--discord-text-normal))' }}
                 >
-                  Quests have moved!
-                </h2>
+                  New Quests Coming Soon
+                </h3>
                 <p 
-                  className="text-sm mb-4 leading-relaxed"
+                  className="text-sm max-w-md mx-auto"
                   style={{ color: 'hsl(var(--discord-text-muted))' }}
                 >
-                  We've moved Quests to their own dedicated space! You can now find all your quests, 
-                  rewards, and progress tracking in one convenient location. Click the button above 
-                  or use the link below to access Quest Home.
+                  Check back later for exciting challenges and rewards. 
+                  In the meantime, explore servers and apps!
                 </p>
-                <a 
-                  href="#"
-                  className="text-sm font-medium hover:underline"
-                  style={{ color: '#5865f2' }}
-                >
-                  Go to Quest Home
-                </a>
               </div>
             </div>
           )}
