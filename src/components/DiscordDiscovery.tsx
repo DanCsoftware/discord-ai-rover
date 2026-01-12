@@ -235,7 +235,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                         <h1 className="text-xl font-bold" style={{ color: 'white' }}>
                           Find your community
                         </h1>
-                        <Sparkles className="w-4 h-4 text-yellow-300" />
+                        <RoverAvatar size="sm" showVerified={false} />
                       </div>
                       <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
                         Tell ROVER what you're into
@@ -336,7 +336,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
               {hasSearched && recommendations.length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="w-5 h-5" style={{ color: '#a78bfa' }} />
+                    <RoverAvatar size="sm" showVerified={false} />
                     <h2 
                       className="text-lg font-bold"
                       style={{ color: 'hsl(var(--discord-text-normal))' }}
