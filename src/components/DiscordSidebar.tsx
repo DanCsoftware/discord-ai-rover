@@ -139,16 +139,21 @@ const DiscordSidebar = ({
           const isMod = membership?.role === 'moderator';
           
           return (
-            <div key={server.id} className="relative">
+            <div key={server.id} className="relative flex items-center justify-center group">
+              {/* Left indicator pill - shows when server is active, shorter on hover */}
+              {isServerActive(server.id) ? (
+                <div className="absolute -left-3 w-1 h-10 rounded-r-full bg-white" />
+              ) : (
+                <div className="absolute -left-3 w-1 h-5 rounded-r-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
               <div
                 onClick={() => onServerClick(server.id)}
                 className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 overflow-hidden ${
                   isServerActive(server.id) ? "rounded-2xl" : "hover:rounded-2xl"
                 }`}
                 style={{ 
-                  background: server.iconStyle?.background || (isServerActive(server.id) ? 'hsl(var(--discord-brand))' : 'hsl(var(--discord-bg-primary))'),
-                  color: 'white',
-                  boxShadow: isAdmin ? '0 0 0 2px #f97316' : isMod ? '0 0 0 2px #5865f2' : 'none'
+                  background: server.iconStyle?.background || 'hsl(var(--discord-bg-primary))',
+                  color: 'white'
                 }}
                 title={server.name}
               >
