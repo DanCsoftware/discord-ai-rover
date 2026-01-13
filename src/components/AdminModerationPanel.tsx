@@ -168,13 +168,13 @@ const AdminModerationPanel = ({ serverName, serverId, messages }: AdminModeratio
       >
         <div 
           className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' }}
+          style={{ backgroundColor: '#2b2d31' }}
         >
           <img 
             src="/lovable-uploads/discord-new-logo-2.webp" 
             alt="ROVER Moderation"
             className="w-8 h-8 object-contain"
-            style={{ filter: 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.1)' }}
+            style={{ filter: 'sepia(1) saturate(5) hue-rotate(-5deg) brightness(0.95)' }}
           />
         </div>
         <div>
@@ -465,13 +465,13 @@ const AdminModerationPanel = ({ serverName, serverId, messages }: AdminModeratio
               <div className="flex items-start gap-3">
                 <div 
                   className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' }}
+                  style={{ backgroundColor: '#2b2d31' }}
                 >
                   <img 
                     src="/lovable-uploads/discord-new-logo-2.webp" 
                     alt="ROVER"
                     className="w-6 h-6 object-contain"
-                    style={{ filter: 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.1)' }}
+                    style={{ filter: 'sepia(1) saturate(5) hue-rotate(-5deg) brightness(0.95)' }}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
