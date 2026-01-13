@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Hash, Volume2, CheckSquare, AtSign } from "lucide-react";
+import { Hash, Volume2, CheckSquare, AtSign, X, Compass, Search, FileText, Shield, Gamepad2, CheckCircle, Sparkles } from "lucide-react";
+import RoverAvatar from "./RoverAvatar";
 import { servers } from "@/data/discordData";
 
 interface QuickSwitcherDialogProps {
@@ -23,6 +24,52 @@ interface QuickSwitcherItem {
   icon: 'hash' | 'volume' | 'check' | 'mention';
 }
 
+// ROVER tips data for slideshow
+const roverTips = [
+  {
+    category: "Navigation",
+    icon: Compass,
+    text: '"help me navigate to privacy settings" or "find notification options"',
+    color: "hsl(var(--discord-blurple))"
+  },
+  {
+    category: "Search",
+    icon: Search,
+    text: '"search for messages about crypto" or "find files from last week"',
+    color: "hsl(142, 76%, 36%)"
+  },
+  {
+    category: "Summarize",
+    icon: FileText,
+    text: '"summarize the last 50 messages" or "what did I miss?"',
+    color: "hsl(45, 93%, 47%)"
+  },
+  {
+    category: "Link Safety",
+    icon: Shield,
+    text: '"is this link safe?" or "check this URL for me"',
+    color: "hsl(0, 84%, 60%)"
+  },
+  {
+    category: "Gaming",
+    icon: Gamepad2,
+    text: '"what games are trending?" or "find gaming servers"',
+    color: "hsl(280, 67%, 55%)"
+  },
+  {
+    category: "Fact Check",
+    icon: CheckCircle,
+    text: '"fact check this claim" or "verify this information"',
+    color: "hsl(199, 89%, 48%)"
+  },
+  {
+    category: "Discovery",
+    icon: Sparkles,
+    text: '"recommend me servers about art" or "find communities for music"',
+    color: "hsl(330, 81%, 60%)"
+  }
+];
+
 const QuickSwitcherDialog = ({
   open,
   onOpenChange,
@@ -32,6 +79,8 @@ const QuickSwitcherDialog = ({
 }: QuickSwitcherDialogProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [showTips, setShowTips] = useState(true);
 
   // Mock data for previous channels and mentions
   const previousChannels: QuickSwitcherItem[] = [
@@ -114,8 +163,21 @@ const QuickSwitcherDialog = ({
     if (open) {
       setSearchQuery("");
       setSelectedIndex(0);
+      setShowTips(true);
+      setCurrentTipIndex(0);
     }
   }, [open]);
+
+  // Auto-rotate tips every 3.5 seconds
+  useEffect(() => {
+    if (!open || !showTips) return;
+    
+    const interval = setInterval(() => {
+      setCurrentTipIndex((prev) => (prev + 1) % roverTips.length);
+    }, 3500);
+    
+    return () => clearInterval(interval);
+  }, [open, showTips]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
@@ -333,19 +395,73 @@ const QuickSwitcherDialog = ({
           )}
         </div>
 
-        {/* PROTIP Footer */}
-        <div 
-          className="px-4 py-3 border-t"
-          style={{ 
-            backgroundColor: 'hsl(var(--discord-bg-tertiary))',
-            borderColor: 'hsl(var(--discord-bg-quaternary))'
-          }}
-        >
-          <p className="text-xs" style={{ color: 'hsl(var(--discord-text-muted))' }}>
-            <span className="font-semibold" style={{ color: 'hsl(var(--discord-yellow))' }}>PROTIP:</span>
-            {' '}Start searches with <span className="font-mono bg-black/20 px-1 rounded">@</span>, <span className="font-mono bg-black/20 px-1 rounded">#</span>, <span className="font-mono bg-black/20 px-1 rounded">!</span>, or <span className="font-mono bg-black/20 px-1 rounded">*</span> to narrow results.
-          </p>
-        </div>
+        {/* ROVER Tips Slideshow Footer */}
+        {showTips && (
+          <div 
+            className="px-4 py-3 border-t"
+            style={{ 
+              backgroundColor: 'hsl(var(--discord-bg-tertiary))',
+              borderColor: 'hsl(var(--discord-bg-quaternary))'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              {/* ROVER Avatar */}
+              <RoverAvatar size="sm" isThinking={false} />
+              
+              {/* Tip Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  {(() => {
+                    const CurrentIcon = roverTips[currentTipIndex].icon;
+                    return (
+                      <CurrentIcon 
+                        className="w-3.5 h-3.5" 
+                        style={{ color: roverTips[currentTipIndex].color }} 
+                      />
+                    );
+                  })()}
+                  <span 
+                    className="text-xs font-semibold"
+                    style={{ color: roverTips[currentTipIndex].color }}
+                  >
+                    ROVER {roverTips[currentTipIndex].category}
+                  </span>
+                </div>
+                <p 
+                  className="text-xs truncate transition-opacity duration-300"
+                  style={{ color: 'hsl(var(--discord-text-muted))' }}
+                >
+                  try: {roverTips[currentTipIndex].text}
+                </p>
+              </div>
+              
+              {/* Dismiss Button */}
+              <button
+                onClick={() => setShowTips(false)}
+                className="p-1 rounded hover:bg-white/10 transition-colors flex-shrink-0"
+                style={{ color: 'hsl(var(--discord-text-muted))' }}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {/* Slide Indicators */}
+            <div className="flex items-center justify-center gap-1 mt-2">
+              {roverTips.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTipIndex(index)}
+                  className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  style={{ 
+                    backgroundColor: index === currentTipIndex 
+                      ? 'hsl(var(--discord-text-normal))' 
+                      : 'hsl(var(--discord-text-muted) / 0.3)'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
