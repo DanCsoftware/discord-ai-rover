@@ -24,6 +24,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
   const [roverAcknowledgment, setRoverAcknowledgment] = useState('');
   const [recommendations, setRecommendations] = useState<ServerRecommendation[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   
   const { streamingResponse, isStreaming, sendMessage } = useRoverChat();
 
@@ -33,11 +34,12 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
     if (!query.trim()) return;
     
     setHasSearched(true);
+    setIsSearching(true);
     setRoverAcknowledgment('');
+    setRecommendations([]);
     
-    // Get recommendations based on query
+    // Get recommendations based on query (but don't show them yet)
     const recs = serverDiscovery.getDiscoveryRecommendations(query);
-    setRecommendations(recs);
     
     try {
       // Get a brief acknowledgment from AI
@@ -51,6 +53,12 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
       console.error('ROVER search error:', e);
       setRoverAcknowledgment(`Found ${recs.length} communities for "${query}"! Check them out below.`);
     }
+    
+    // Add realistic delay before showing results
+    setTimeout(() => {
+      setRecommendations(recs);
+      setIsSearching(false);
+    }, 800);
   };
 
   const handleTagClick = (tag: string) => {
@@ -331,64 +339,71 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                 />
               </div>
 
-              {/* ROVER Recommendations Section - Only after search */}
-              {hasSearched && recommendations.length > 0 && (
+              {/* ROVER Recommendations Section - Shows loading or results */}
+              {hasSearched && (
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-4">
-                    <RoverAvatar size="sm" showVerified={false} />
+                    <RoverAvatar size="sm" showVerified={false} isThinking={isSearching} />
                     <h2 
                       className="text-lg font-bold"
                       style={{ color: 'hsl(var(--discord-text-normal))' }}
                     >
-                      Recommended for You
+                      {isSearching ? 'Finding Communities...' : 'Recommended for You'}
                     </h2>
-                    <span 
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: 'rgba(167, 139, 250, 0.2)', color: '#a78bfa' }}
-                    >
-                      {recommendations.length} new
-                    </span>
+                    {!isSearching && recommendations.length > 0 && (
+                      <span 
+                        className="text-xs px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: 'rgba(167, 139, 250, 0.2)', color: '#a78bfa' }}
+                      >
+                        {recommendations.length} new
+                      </span>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {recommendations.slice(0, 8).map((rec) => {
-                      const discoveryMeta = serverDiscoveryData[rec.server.id];
-                      const extendedMeta = discoveryMetadata[rec.server.id];
-                      if (!discoveryMeta) return null;
-                      
-                      return (
-                        <RoverRecommendationCard
-                          key={rec.server.id}
-                          server={rec.server}
-                          discoveryMeta={discoveryMeta}
-                          extendedMeta={extendedMeta}
-                          matchScore={rec.matchScore}
-                          matchReasons={rec.matchReasons}
-                          onExplore={() => {
-                            console.log('Explore server:', rec.server.id);
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                  {/* Loading State */}
+                  {isSearching && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div 
+                          key={i}
+                          className="rounded-xl overflow-hidden animate-pulse"
+                          style={{ backgroundColor: 'hsl(var(--discord-bg-secondary))' }}
+                        >
+                          <div className="h-32" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))' }} />
+                          <div className="p-4 space-y-3">
+                            <div className="h-4 rounded" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))', width: '60%' }} />
+                            <div className="h-3 rounded" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))', width: '80%' }} />
+                            <div className="h-3 rounded" style={{ backgroundColor: 'hsl(var(--discord-bg-tertiary))', width: '40%' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-              {/* Empty State - Before Search */}
-              {!hasSearched && (
-                <div className="text-center py-16">
-                  <h3 
-                    className="text-lg font-semibold mb-2"
-                    style={{ color: 'hsl(var(--discord-text-normal))' }}
-                  >
-                    Tell ROVER what you're looking for
-                  </h3>
-                  <p 
-                    className="text-sm"
-                    style={{ color: 'hsl(var(--discord-text-muted))' }}
-                  >
-                    Type your interests above or click a tag to get started
-                  </p>
+                  {/* Results */}
+                  {!isSearching && recommendations.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {recommendations.slice(0, 8).map((rec) => {
+                        const discoveryMeta = serverDiscoveryData[rec.server.id];
+                        const extendedMeta = discoveryMetadata[rec.server.id];
+                        if (!discoveryMeta) return null;
+                        
+                        return (
+                          <RoverRecommendationCard
+                            key={rec.server.id}
+                            server={rec.server}
+                            discoveryMeta={discoveryMeta}
+                            extendedMeta={extendedMeta}
+                            matchScore={rec.matchScore}
+                            matchReasons={rec.matchReasons}
+                            onExplore={() => {
+                              console.log('Explore server:', rec.server.id);
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
