@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { 
-  Shield, 
   AlertTriangle, 
   Ban, 
   Clock, 
@@ -13,8 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  CheckCircle2,
-  Bot
+  CheckCircle2
 } from 'lucide-react';
 import { useRoverChat } from '@/hooks/useRoverChat';
 import { Message } from '@/data/discordData';
@@ -169,10 +167,15 @@ const AdminModerationPanel = ({ serverName, serverId, messages }: AdminModeratio
         style={{ borderBottom: '1px solid hsl(var(--discord-bg-quaternary))' }}
       >
         <div 
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
           style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' }}
         >
-          <Shield className="w-5 h-5 text-white" />
+          <img 
+            src="/lovable-uploads/discord-new-logo-2.webp" 
+            alt="ROVER Moderation"
+            className="w-8 h-8 object-contain"
+            style={{ filter: 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.1)' }}
+          />
         </div>
         <div>
           <h2 className="font-bold text-sm" style={{ color: 'hsl(var(--discord-text-normal))' }}>
@@ -461,10 +464,15 @@ const AdminModerationPanel = ({ serverName, serverId, messages }: AdminModeratio
             >
               <div className="flex items-start gap-3">
                 <div 
-                  className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #5865f2 0%, #7c3aed 100%)' }}
+                  className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' }}
                 >
-                  <Bot className="w-4 h-4 text-white" />
+                  <img 
+                    src="/lovable-uploads/discord-new-logo-2.webp" 
+                    alt="ROVER"
+                    className="w-6 h-6 object-contain"
+                    style={{ filter: 'sepia(1) saturate(3) hue-rotate(-10deg) brightness(1.1)' }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
