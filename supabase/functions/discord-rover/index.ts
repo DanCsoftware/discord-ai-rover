@@ -311,6 +311,138 @@ async function handleModerationAction(supabase: any, channelContext: any, action
   )
 }
 
+async function handleServerDiscovery(channelContext: any, apiKey: string) {
+  console.log('🔍 Starting server discovery analysis...')
+  
+  const { query, servers } = channelContext
+  
+  if (!query || !servers || servers.length === 0) {
+    return new Response(
+      JSON.stringify({ matches: [] }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  // Build the discovery prompt
+  const serversList = servers.map((s: any) => 
+    `- ID: ${s.id}, Name: "${s.name}", Category: ${s.category || 'General'}, Tags: [${(s.tags || []).join(', ')}], Description: ${s.description || 'No description'}, Experience Level: ${s.experienceLevel || 'all'}, Activity: ${s.activityLevel || 'medium'}, Members: ${s.memberCount || 0}`
+  ).join('\n')
+
+  const discoveryPrompt = `You are ROVER's server discovery system. Analyze the user's query and score each server based on relevance.
+
+USER QUERY: "${query}"
+
+AVAILABLE SERVERS:
+${serversList}
+
+SCORING RULES:
+1. Score from 0-100 based on query relevance
+2. Direct keyword matches in name/tags = HIGH score (85-100)
+3. Related category/topic = MEDIUM score (60-84)
+4. Tangentially related = LOW score (40-59)
+5. Unrelated servers = VERY LOW (0-39)
+
+IMPORTANT:
+- "dungeons and dragons" queries should ONLY highly match D&D/TTRPG servers
+- "League of Legends" should NOT match D&D queries (different games entirely)
+- Experience level keywords ("beginner", "advanced", "newbie") should boost matching servers
+- Be STRICT - unrelated servers should score below 30
+
+For each server, provide 2-3 specific reasons why it matches (or doesn't match) the query.
+
+Return the analysis through the provided function.`
+
+  console.log('🤖 Calling Gemini API for server discovery...')
+
+  const geminiResponse = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: discoveryPrompt }] }],
+        tools: [{
+          functionDeclarations: [{
+            name: 'submit_server_matches',
+            description: 'Submit the server match scores and reasons',
+            parameters: {
+              type: 'object',
+              properties: {
+                matches: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      serverId: { type: 'number', description: 'Server ID' },
+                      matchScore: { type: 'number', description: 'Match score 0-100' },
+                      matchReasons: { 
+                        type: 'array', 
+                        items: { type: 'string' },
+                        description: 'Reasons for the match score'
+                      }
+                    },
+                    required: ['serverId', 'matchScore', 'matchReasons']
+                  }
+                }
+              },
+              required: ['matches']
+            }
+          }]
+        }],
+        toolConfig: {
+          functionCallingConfig: {
+            mode: 'ANY',
+            allowedFunctionNames: ['submit_server_matches']
+          }
+        },
+        generationConfig: {
+          temperature: 0.2,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 4096,
+        },
+      }),
+    }
+  )
+
+  if (!geminiResponse.ok) {
+    const errorText = await geminiResponse.text()
+    console.error('Gemini API error:', geminiResponse.status, errorText)
+    throw new Error(`Gemini API error: ${geminiResponse.status}`)
+  }
+
+  const geminiData = await geminiResponse.json()
+  console.log('📊 Gemini discovery response received')
+
+  // Extract the function call result
+  let discoveryResult = { matches: [] }
+  
+  try {
+    const functionCall = geminiData.candidates?.[0]?.content?.parts?.[0]?.functionCall
+    if (functionCall && functionCall.name === 'submit_server_matches') {
+      discoveryResult = functionCall.args
+      console.log('✅ Extracted discovery matches:', discoveryResult.matches?.length || 0)
+    } else {
+      // Fallback: try to parse from text
+      const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
+      if (textContent) {
+        console.log('⚠️ No function call, attempting text parse')
+        const jsonMatch = textContent.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          discoveryResult = JSON.parse(jsonMatch[0])
+        }
+      }
+    }
+  } catch (parseError) {
+    console.error('❌ Parse error:', parseError)
+  }
+
+  return new Response(
+    JSON.stringify(discoveryResult),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  )
+}
+
 async function handleChatMode(supabase: any, messages: any[], channelContext: any, apiKey: string) {
   // Create a run record
   const { data: run, error: runError } = await supabase
@@ -449,6 +581,8 @@ serve(async (req) => {
       return await handleModerationAnalysis(supabase, channelContext, GEMINI_API_KEY)
     } else if (requestType === 'moderation_action') {
       return await handleModerationAction(supabase, channelContext, actionDetails)
+    } else if (requestType === 'server_discovery') {
+      return await handleServerDiscovery(channelContext, GEMINI_API_KEY)
     } else {
       // Default: chat mode
       return await handleChatMode(supabase, messages, channelContext, GEMINI_API_KEY)
