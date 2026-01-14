@@ -3799,6 +3799,370 @@ export const discoverableServers = [
     },
     textChannels: [],
     voiceChannels: []
+  },
+  // NEW D&D/Tabletop Servers by Skill Level (101-108)
+  {
+    id: 101,
+    name: "D&D Beginners Academy",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)",
+      text: "🎲",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 102,
+    name: "TTRPG Newbies Welcome",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)",
+      text: "📖",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 103,
+    name: "D&D Campaign Hub",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%)",
+      text: "⚔️",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 104,
+    name: "Homebrew Workshop",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #f472b6 0%, #ec4899 50%, #db2777 100%)",
+      text: "🧪",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 105,
+    name: "Dungeon Masters Guild",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)",
+      text: "👑",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 106,
+    name: "D&D Hardcore Campaigns",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)",
+      text: "💀",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 107,
+    name: "One-Shot Masters",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%)",
+      text: "🎭",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 108,
+    name: "Pathfinder Society",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #f97316 0%, #ea580c 50%, #c2410c 100%)",
+      text: "🗡️",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  // NEW Gaming Servers (109-118)
+  {
+    id: 109,
+    name: "Baldur's Gate 3 Fans",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)",
+      text: "🐙",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 110,
+    name: "FFXIV Warriors of Light",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)",
+      text: "🌟",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 111,
+    name: "Dead by Daylight",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%)",
+      text: "🔪",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 112,
+    name: "Elden Ring Tarnished",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #eab308 0%, #ca8a04 50%, #a16207 100%)",
+      text: "🌳",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 113,
+    name: "Genshin Impact Hub",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%)",
+      text: "⭐",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 114,
+    name: "Destiny 2 Guardians",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #64748b 0%, #475569 50%, #334155 100%)",
+      text: "🌙",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 115,
+    name: "Overwatch 2 LFG",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #f97316 0%, #fb923c 50%, #fdba74 100%)",
+      text: "🎯",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 116,
+    name: "League of Legends Academy",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #0284c7 0%, #0369a1 50%, #075985 100%)",
+      text: "⚡",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 117,
+    name: "Cozy Gamers Collective",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #fda4af 0%, #fb7185 50%, #f43f5e 100%)",
+      text: "🌸",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 118,
+    name: "Souls-like Veterans",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #27272a 0%, #18181b 50%, #09090b 100%)",
+      text: "☠️",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  // NEW Tech Servers (119-123)
+  {
+    id: 119,
+    name: "Rust Programming",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #b45309 0%, #92400e 50%, #78350f 100%)",
+      text: "🦀",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 120,
+    name: "Game Dev Beginners",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #84cc16 0%, #65a30d 50%, #4d7c0f 100%)",
+      text: "🎮",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 121,
+    name: "UI/UX Designers Hub",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #ec4899 0%, #d946ef 50%, #a855f7 100%)",
+      text: "✨",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 122,
+    name: "Web Dev Wizards",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%)",
+      text: "🌐",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 123,
+    name: "DevOps Engineers",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%)",
+      text: "🔧",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  // NEW Entertainment/Lifestyle Servers (124-130)
+  {
+    id: 124,
+    name: "Sci-Fi Book Club",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #312e81 0%, #3730a3 50%, #4338ca 100%)",
+      text: "🚀",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 125,
+    name: "Broadway Musical Fans",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%)",
+      text: "🎭",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 126,
+    name: "ADHD Support & Tips",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #facc15 0%, #eab308 50%, #ca8a04 100%)",
+      text: "🧠",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 127,
+    name: "Dungeons & Daddies Fans",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #a3e635 0%, #84cc16 50%, #65a30d 100%)",
+      text: "🎙️",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 128,
+    name: "Plant-Based Cooking",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%)",
+      text: "🥗",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 129,
+    name: "Solo RPG Journalers",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)",
+      text: "📓",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
+  },
+  {
+    id: 130,
+    name: "TTRPG Mapmakers",
+    icon: "",
+    iconStyle: {
+      background: "linear-gradient(145deg, #0891b2 0%, #0e7490 50%, #155e75 100%)",
+      text: "🗺️",
+      textSize: "1.5rem"
+    },
+    textChannels: [],
+    voiceChannels: []
   }
 ];
 
@@ -4512,6 +4876,220 @@ export const serverDiscoveryData: Record<number, ServerDiscoveryMeta> = {
     onlineCount: 28901,
     memberCount: 198765,
     isVerified: false
+  },
+  // NEW D&D/Tabletop Servers (101-108)
+  101: {
+    bannerImage: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&h=300&fit=crop",
+    description: "Your first adventure awaits! A beginner-friendly D&D community with patient teachers and new player resources.",
+    onlineCount: 8901,
+    memberCount: 45678,
+    isVerified: false
+  },
+  102: {
+    bannerImage: "https://images.unsplash.com/photo-1632157464492-3c3b40e5abc6?w=800&h=300&fit=crop",
+    description: "Learn any tabletop RPG! D&D, Pathfinder, Call of Cthulhu - we teach them all from scratch.",
+    onlineCount: 5678,
+    memberCount: 34567,
+    isVerified: false
+  },
+  103: {
+    bannerImage: "https://images.unsplash.com/photo-1518562923427-a21892c18af8?w=800&h=300&fit=crop",
+    description: "Active D&D campaigns with experienced players. Session planning, roleplay-focused groups, and lasting adventures.",
+    onlineCount: 12345,
+    memberCount: 67890,
+    isVerified: true
+  },
+  104: {
+    bannerImage: "https://images.unsplash.com/photo-1516110833967-0b5716ca1387?w=800&h=300&fit=crop",
+    description: "Create custom D&D content! Classes, races, items, and monsters - balance testing and peer feedback.",
+    onlineCount: 7890,
+    memberCount: 56789,
+    isVerified: false
+  },
+  105: {
+    bannerImage: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=800&h=300&fit=crop",
+    description: "Elite DMs sharing advanced techniques. Complex campaign design, world-building, and narrative mastery.",
+    onlineCount: 9876,
+    memberCount: 78901,
+    isVerified: true
+  },
+  106: {
+    bannerImage: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=800&h=300&fit=crop",
+    description: "Brutal difficulty, deep roleplay, permadeath optional. For veteran players seeking real challenge.",
+    onlineCount: 4567,
+    memberCount: 23456,
+    isVerified: false
+  },
+  107: {
+    bannerImage: "https://images.unsplash.com/photo-1585504198199-20277593b94f?w=800&h=300&fit=crop",
+    description: "Master the art of one-shots. Quick adventures, drop-in play, and creative mini-campaigns.",
+    onlineCount: 6789,
+    memberCount: 45678,
+    isVerified: false
+  },
+  108: {
+    bannerImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=300&fit=crop",
+    description: "The premier Pathfinder community. Society play, homebrew, and deep system mastery.",
+    onlineCount: 8901,
+    memberCount: 56789,
+    isVerified: true
+  },
+  // NEW Gaming Servers (109-118)
+  109: {
+    bannerImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&h=300&fit=crop",
+    description: "Everything Baldur's Gate 3! Builds, lore, mods, and co-op adventures in the Forgotten Realms.",
+    onlineCount: 45678,
+    memberCount: 234567,
+    isVerified: true
+  },
+  110: {
+    bannerImage: "https://images.unsplash.com/photo-1636489953081-c6dc35f8c689?w=800&h=300&fit=crop",
+    description: "Warriors of Light unite! FFXIV raids, glamour contests, housing tips, and free company recruitment.",
+    onlineCount: 56789,
+    memberCount: 345678,
+    isVerified: true
+  },
+  111: {
+    bannerImage: "https://images.unsplash.com/photo-1509248961895-40c6e0f28b91?w=800&h=300&fit=crop",
+    description: "Survive the Entity's realm. Killer mains, survivor tips, and PTB testing discussions.",
+    onlineCount: 23456,
+    memberCount: 156789,
+    isVerified: true
+  },
+  112: {
+    bannerImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=300&fit=crop",
+    description: "Rise, Tarnished! Builds, lore theories, boss strategies, and jolly cooperation.",
+    onlineCount: 34567,
+    memberCount: 189012,
+    isVerified: true
+  },
+  113: {
+    bannerImage: "https://images.unsplash.com/photo-1560762484-813fc97650a0?w=800&h=300&fit=crop",
+    description: "Travelers of Teyvat! Character guides, gacha salt, and exploration discoveries.",
+    onlineCount: 67890,
+    memberCount: 456789,
+    isVerified: true
+  },
+  114: {
+    bannerImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&h=300&fit=crop",
+    description: "Eyes up, Guardian! Raid teams, PvP tips, and exotic farming guides.",
+    onlineCount: 34567,
+    memberCount: 198765,
+    isVerified: true
+  },
+  115: {
+    bannerImage: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=300&fit=crop",
+    description: "Find your team! Overwatch 2 ranked LFG, coaching, and competitive scrims.",
+    onlineCount: 23456,
+    memberCount: 145678,
+    isVerified: false
+  },
+  116: {
+    bannerImage: "https://images.unsplash.com/photo-1493711662062-fa541f7f3d24?w=800&h=300&fit=crop",
+    description: "Learn League the right way. Beginner-friendly coaching, role guides, and climb advice.",
+    onlineCount: 45678,
+    memberCount: 267890,
+    isVerified: true
+  },
+  117: {
+    bannerImage: "https://images.unsplash.com/photo-1533561797500-014a1d8fd7d9?w=800&h=300&fit=crop",
+    description: "Wholesome gaming vibes. Animal Crossing, Stardew, cozy indie games, and zero toxicity.",
+    onlineCount: 23456,
+    memberCount: 134567,
+    isVerified: false
+  },
+  118: {
+    bannerImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=300&fit=crop",
+    description: "Git gud together. Dark Souls, Sekiro, Elden Ring - hardcore players helping each other.",
+    onlineCount: 12345,
+    memberCount: 89012,
+    isVerified: false
+  },
+  // NEW Tech Servers (119-123)
+  119: {
+    bannerImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=300&fit=crop",
+    description: "Systems programming excellence. Rust language learners and experts sharing knowledge.",
+    onlineCount: 15678,
+    memberCount: 89012,
+    isVerified: true
+  },
+  120: {
+    bannerImage: "https://images.unsplash.com/photo-1556438064-2d7646166914?w=800&h=300&fit=crop",
+    description: "Start your game dev journey! Unity, Godot, and beginner-friendly project help.",
+    onlineCount: 9876,
+    memberCount: 67890,
+    isVerified: false
+  },
+  121: {
+    bannerImage: "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?w=800&h=300&fit=crop",
+    description: "Design that delights. UI/UX portfolios, critiques, job hunting, and design systems.",
+    onlineCount: 12345,
+    memberCount: 78901,
+    isVerified: true
+  },
+  122: {
+    bannerImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=300&fit=crop",
+    description: "Frontend, backend, fullstack! React, Node, TypeScript - web dev help and projects.",
+    onlineCount: 23456,
+    memberCount: 145678,
+    isVerified: true
+  },
+  123: {
+    bannerImage: "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=800&h=300&fit=crop",
+    description: "Infrastructure as code. Docker, Kubernetes, CI/CD pipelines, and cloud architecture.",
+    onlineCount: 8901,
+    memberCount: 56789,
+    isVerified: false
+  },
+  // NEW Entertainment/Lifestyle Servers (124-130)
+  124: {
+    bannerImage: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=800&h=300&fit=crop",
+    description: "Explore strange new worlds. Sci-fi literature discussions from Asimov to modern releases.",
+    onlineCount: 7890,
+    memberCount: 56789,
+    isVerified: false
+  },
+  125: {
+    bannerImage: "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&h=300&fit=crop",
+    description: "The stage awaits! Broadway discussions, bootleg trades, and musical theatre enthusiasm.",
+    onlineCount: 12345,
+    memberCount: 78901,
+    isVerified: true
+  },
+  126: {
+    bannerImage: "https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=800&h=300&fit=crop",
+    description: "Thriving with ADHD. Productivity hacks, medication discussions, and peer support.",
+    onlineCount: 23456,
+    memberCount: 134567,
+    isVerified: true
+  },
+  127: {
+    bannerImage: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&h=300&fit=crop",
+    description: "Fans of the podcast! Episode discussions, fan theories, and D&D comedy appreciation.",
+    onlineCount: 15678,
+    memberCount: 89012,
+    isVerified: false
+  },
+  128: {
+    bannerImage: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=300&fit=crop",
+    description: "Delicious plant-based recipes. Vegan cooking tips, meal prep, and nutrition advice.",
+    onlineCount: 8901,
+    memberCount: 56789,
+    isVerified: false
+  },
+  129: {
+    bannerImage: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=300&fit=crop",
+    description: "Play tabletop alone! Solo RPG systems, journaling games, and narrative tools.",
+    onlineCount: 4567,
+    memberCount: 34567,
+    isVerified: false
+  },
+  130: {
+    bannerImage: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&h=300&fit=crop",
+    description: "Create stunning battle maps. Dungeondraft, Inkarnate, hand-drawn maps, and tokens.",
+    onlineCount: 9876,
+    memberCount: 67890,
+    isVerified: true
   }
 };
 
@@ -4524,6 +5102,7 @@ export interface DiscoveryServerMeta {
   whyJoin: string[];
   primaryGames?: string[];
   specialFeatures?: string[];
+  experienceLevel?: 'beginner' | 'intermediate' | 'advanced' | 'all';
 }
 
 export const discoveryMetadata: Record<number, DiscoveryServerMeta> = {
@@ -5648,5 +6227,401 @@ export const discoveryMetadata: Record<number, DiscoveryServerMeta> = {
       'Cultural adjustment support'
     ],
     specialFeatures: ['Country Guides', 'Visa Help', 'Culture Exchange']
+  },
+  // NEW D&D/Tabletop Servers with Skill Levels (101-108)
+  101: {
+    category: 'Gaming',
+    tags: ['dnd', 'dungeons-dragons', 'tabletop', 'rpg', 'beginner', 'newbie', 'learn', 'tutorial'],
+    activityLevel: 'high',
+    communityVibe: 'Patient mentors helping new adventurers',
+    experienceLevel: 'beginner',
+    whyJoin: [
+      'Learn D&D rules at your own pace',
+      'Beginner-only one-shots every weekend',
+      'Friendly DMs who specialize in teaching'
+    ],
+    specialFeatures: ['New Player Guide', 'Rules Q&A', 'First Campaign Finder']
+  },
+  102: {
+    category: 'Gaming',
+    tags: ['ttrpg', 'tabletop', 'pathfinder', 'cthulhu', 'beginner', 'newbie', 'multi-system', 'learn'],
+    activityLevel: 'medium',
+    communityVibe: 'Multi-system explorers welcoming newbies',
+    experienceLevel: 'beginner',
+    whyJoin: [
+      'Try different systems before committing',
+      'System comparison guides for beginners',
+      'No pressure to know the rules'
+    ],
+    specialFeatures: ['System Intro Sessions', 'Rule Summaries', 'Newbie Games']
+  },
+  103: {
+    category: 'Gaming',
+    tags: ['dnd', 'dungeons-dragons', 'campaigns', 'roleplay', 'intermediate', 'ongoing', 'sessions'],
+    activityLevel: 'high',
+    communityVibe: 'Dedicated roleplayers in ongoing adventures',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'Join established campaigns with open spots',
+      'Strong roleplay focus and character development',
+      'Session scheduling tools and reminders'
+    ],
+    primaryGames: ['D&D 5e', 'Pathfinder 2e'],
+    specialFeatures: ['Campaign Board', 'Character Workshop', 'Session Logs']
+  },
+  104: {
+    category: 'Gaming',
+    tags: ['dnd', 'homebrew', 'custom', 'design', 'intermediate', 'advanced', 'balance', 'creation'],
+    activityLevel: 'medium',
+    communityVibe: 'Creative designers crafting custom content',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'Peer feedback on your homebrew creations',
+      'Balance testing with experienced players',
+      'Curated homebrew library to use'
+    ],
+    specialFeatures: ['Homebrew Reviews', 'Balance Calculator', 'Content Library']
+  },
+  105: {
+    category: 'Gaming',
+    tags: ['dnd', 'dm', 'dungeon-master', 'advanced', 'expert', 'worldbuilding', 'narrative', 'veteran'],
+    activityLevel: 'high',
+    communityVibe: 'Master DMs perfecting their craft',
+    experienceLevel: 'advanced',
+    whyJoin: [
+      'Advanced DMing techniques and theory',
+      'Complex encounter and narrative design',
+      'Network with professional DMs'
+    ],
+    specialFeatures: ['DM Workshops', 'World Anvil Tips', 'Advanced Encounters']
+  },
+  106: {
+    category: 'Gaming',
+    tags: ['dnd', 'hardcore', 'veteran', 'advanced', 'difficult', 'permadeath', 'serious', 'challenge'],
+    activityLevel: 'medium',
+    communityVibe: 'Battle-hardened veterans seeking challenge',
+    experienceLevel: 'advanced',
+    whyJoin: [
+      'Campaigns with real consequences',
+      'Players who know their stuff',
+      'Hardcore rulesets and variants'
+    ],
+    primaryGames: ['D&D 5e Hardcore', 'OSR', 'Dark Fantasy'],
+    specialFeatures: ['Gritty Realism', 'Permadeath Campaigns', 'Veteran LFG']
+  },
+  107: {
+    category: 'Gaming',
+    tags: ['dnd', 'one-shot', 'quick', 'drop-in', 'intermediate', 'variety', 'mini-campaigns'],
+    activityLevel: 'high',
+    communityVibe: 'Quick adventures for busy schedules',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'No long-term commitment needed',
+      'Try different characters and scenarios',
+      'Games that fit any schedule'
+    ],
+    specialFeatures: ['Drop-In Games', 'One-Shot Library', 'Quick Character Gen']
+  },
+  108: {
+    category: 'Gaming',
+    tags: ['pathfinder', 'paizo', 'ttrpg', 'advanced', 'intermediate', 'pfs', 'society'],
+    activityLevel: 'high',
+    communityVibe: 'Pathfinder enthusiasts mastering the system',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'Official Pathfinder Society games',
+      'Pathfinder 1e and 2e communities',
+      'Deep mechanical discussions'
+    ],
+    primaryGames: ['Pathfinder 2e', 'Pathfinder 1e', 'Starfinder'],
+    specialFeatures: ['PFS Games', 'Build Guides', 'Adventure Paths']
+  },
+  // NEW Gaming Servers (109-118)
+  109: {
+    category: 'Gaming',
+    tags: ['baldurs-gate-3', 'bg3', 'larian', 'crpg', 'dnd', 'mods', 'builds'],
+    activityLevel: 'very_high',
+    communityVibe: 'Obsessed with all things Baldur\'s Gate 3',
+    whyJoin: [
+      'Build guides for every class combo',
+      'Mod recommendations and troubleshooting',
+      'Multiplayer party finder'
+    ],
+    primaryGames: ['Baldur\'s Gate 3'],
+    specialFeatures: ['Build Calculator', 'Mod Database', 'Co-op LFG']
+  },
+  110: {
+    category: 'Gaming',
+    tags: ['ffxiv', 'final-fantasy', 'mmorpg', 'raids', 'glamour', 'housing', 'fc'],
+    activityLevel: 'very_high',
+    communityVibe: 'Warriors of Light on every data center',
+    whyJoin: [
+      'Raid static recruitment',
+      'Glamour contests and showcases',
+      'Free company networking'
+    ],
+    primaryGames: ['Final Fantasy XIV'],
+    specialFeatures: ['Raid Finder', 'Glamour Dresser', 'FC Recruitment']
+  },
+  111: {
+    category: 'Gaming',
+    tags: ['dbd', 'dead-by-daylight', 'horror', 'killer', 'survivor', 'asymmetric'],
+    activityLevel: 'high',
+    communityVibe: 'Survivors and killers discussing the meta',
+    whyJoin: [
+      'Build guides for every killer and survivor',
+      'PTB testing discussions',
+      'SWF group finder'
+    ],
+    primaryGames: ['Dead by Daylight'],
+    specialFeatures: ['Build Tier Lists', 'SWF Finder', 'Patch Analysis']
+  },
+  112: {
+    category: 'Gaming',
+    tags: ['elden-ring', 'fromsoft', 'soulsborne', 'builds', 'lore', 'pvp', 'coop'],
+    activityLevel: 'high',
+    communityVibe: 'Tarnished sharing the journey together',
+    whyJoin: [
+      'Boss strategies and cheese methods',
+      'Build optimization guides',
+      'Lore theory discussions'
+    ],
+    primaryGames: ['Elden Ring'],
+    specialFeatures: ['Build Planner', 'Boss Guides', 'Lore Wiki']
+  },
+  113: {
+    category: 'Gaming',
+    tags: ['genshin', 'gacha', 'anime', 'exploration', 'builds', 'artifacts', 'primogems'],
+    activityLevel: 'very_high',
+    communityVibe: 'Travelers exploring Teyvat together',
+    whyJoin: [
+      'Character build guides and team comps',
+      'Gacha salt therapy sessions',
+      'Primogem saving strategies'
+    ],
+    primaryGames: ['Genshin Impact', 'Honkai Star Rail'],
+    specialFeatures: ['Build Guides', 'Leak Discussions', 'Domain Co-op']
+  },
+  114: {
+    category: 'Gaming',
+    tags: ['destiny-2', 'bungie', 'raids', 'pvp', 'exotics', 'fireteam', 'looter-shooter'],
+    activityLevel: 'high',
+    communityVibe: 'Guardians united across the system',
+    whyJoin: [
+      'Raid sherpa and teaching runs',
+      'Exotic farming groups',
+      'PvP improvement tips'
+    ],
+    primaryGames: ['Destiny 2'],
+    specialFeatures: ['Raid LFG', 'Exotic Guides', 'Trials Teams']
+  },
+  115: {
+    category: 'Gaming',
+    tags: ['overwatch-2', 'fps', 'competitive', 'ranked', 'lfg', 'coaching'],
+    activityLevel: 'high',
+    communityVibe: 'Competitive players climbing ranks',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Find teammates at your rank',
+      'VOD reviews and coaching',
+      'Scrim team recruitment'
+    ],
+    primaryGames: ['Overwatch 2'],
+    specialFeatures: ['Rank LFG', 'VOD Reviews', 'Scrim Finder']
+  },
+  116: {
+    category: 'Gaming',
+    tags: ['league', 'lol', 'moba', 'beginner', 'coaching', 'guides', 'improvement'],
+    activityLevel: 'very_high',
+    communityVibe: 'Helping new players improve at League',
+    experienceLevel: 'beginner',
+    whyJoin: [
+      'Free coaching from high-elo players',
+      'Role-specific guides and champions',
+      'Positive learning environment'
+    ],
+    primaryGames: ['League of Legends'],
+    specialFeatures: ['Free Coaching', 'Role Guides', 'Climb Groups']
+  },
+  117: {
+    category: 'Gaming',
+    tags: ['cozy', 'relaxing', 'animal-crossing', 'stardew', 'indie', 'wholesome', 'chill'],
+    activityLevel: 'medium',
+    communityVibe: 'Wholesome gamers enjoying the journey',
+    whyJoin: [
+      'Zero toxicity policy strictly enforced',
+      'Cozy game recommendations',
+      'Relaxed multiplayer sessions'
+    ],
+    primaryGames: ['Animal Crossing', 'Stardew Valley', 'Spiritfarer'],
+    specialFeatures: ['Island Tours', 'Farm Showcases', 'Cozy Game Recs']
+  },
+  118: {
+    category: 'Gaming',
+    tags: ['soulsborne', 'dark-souls', 'sekiro', 'fromsoft', 'hardcore', 'advanced', 'veteran'],
+    activityLevel: 'medium',
+    communityVibe: 'Veterans who love punishing difficulty',
+    experienceLevel: 'advanced',
+    whyJoin: [
+      'Challenge run discussions',
+      'Speedrun routes and tips',
+      'No hand-holding, git gud culture'
+    ],
+    primaryGames: ['Dark Souls 1-3', 'Sekiro', 'Elden Ring', 'Bloodborne'],
+    specialFeatures: ['Challenge Runs', 'Speedrun Guides', 'PvP Arena']
+  },
+  // NEW Tech Servers (119-123)
+  119: {
+    category: 'Technology',
+    tags: ['rust', 'programming', 'systems', 'memory-safe', 'cargo', 'webassembly'],
+    activityLevel: 'high',
+    communityVibe: 'Rustaceans helping each other learn',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'Code reviews and pair programming',
+      'Project showcase and feedback',
+      'Job market discussions'
+    ],
+    specialFeatures: ['Code Reviews', 'Project Help', 'Learning Resources']
+  },
+  120: {
+    category: 'Technology',
+    tags: ['gamedev', 'unity', 'godot', 'beginner', 'learn', 'tutorial', 'indie'],
+    activityLevel: 'high',
+    communityVibe: 'New game devs learning together',
+    experienceLevel: 'beginner',
+    whyJoin: [
+      'Step-by-step project tutorials',
+      'No question too basic',
+      'First game jam teams'
+    ],
+    specialFeatures: ['Tutorials', 'Beginner Projects', 'Jam Teams']
+  },
+  121: {
+    category: 'Technology',
+    tags: ['uiux', 'design', 'figma', 'portfolio', 'ux-research', 'product-design'],
+    activityLevel: 'high',
+    communityVibe: 'Designers crafting better experiences',
+    whyJoin: [
+      'Portfolio reviews and critiques',
+      'Job hunting tips and referrals',
+      'Design challenge weekends'
+    ],
+    specialFeatures: ['Portfolio Reviews', 'Job Board', 'Design Challenges']
+  },
+  122: {
+    category: 'Technology',
+    tags: ['webdev', 'javascript', 'react', 'nodejs', 'typescript', 'frontend', 'backend'],
+    activityLevel: 'very_high',
+    communityVibe: 'Web developers shipping projects',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Code help for any framework',
+      'Project feedback and code reviews',
+      'Career advice and mentorship'
+    ],
+    specialFeatures: ['Code Help', 'Project Showcase', 'Interview Prep']
+  },
+  123: {
+    category: 'Technology',
+    tags: ['devops', 'docker', 'kubernetes', 'cloud', 'aws', 'cicd', 'infrastructure'],
+    activityLevel: 'medium',
+    communityVibe: 'Infrastructure engineers automating everything',
+    experienceLevel: 'intermediate',
+    whyJoin: [
+      'Architecture discussions',
+      'Troubleshooting help',
+      'Cert study groups'
+    ],
+    specialFeatures: ['Arch Reviews', 'Troubleshooting', 'Cert Prep']
+  },
+  // NEW Entertainment/Lifestyle Servers (124-130)
+  124: {
+    category: 'Entertainment',
+    tags: ['scifi', 'books', 'literature', 'reading', 'asimov', 'dune', 'space-opera'],
+    activityLevel: 'medium',
+    communityVibe: 'Sci-fi enthusiasts exploring the genre',
+    whyJoin: [
+      'Monthly sci-fi book club',
+      'Author deep-dives and analysis',
+      'Sub-genre recommendations'
+    ],
+    specialFeatures: ['Book Club', 'Author Spotlights', 'Genre Guides']
+  },
+  125: {
+    category: 'Entertainment',
+    tags: ['broadway', 'musicals', 'theatre', 'hamilton', 'wicked', 'stage', 'performing-arts'],
+    activityLevel: 'high',
+    communityVibe: 'Musical theatre enthusiasts and performers',
+    whyJoin: [
+      'Show recommendations by style',
+      'Bootleg (legal recordings) trading',
+      'Performer support and audition tips'
+    ],
+    specialFeatures: ['Show Reviews', 'Recording Trades', 'Audition Help']
+  },
+  126: {
+    category: 'Lifestyle',
+    tags: ['adhd', 'neurodivergent', 'support', 'productivity', 'mental-health', 'tips'],
+    activityLevel: 'very_high',
+    communityVibe: 'ADHD brains supporting each other',
+    whyJoin: [
+      'Productivity hacks that actually work',
+      'Medication discussion and support',
+      'Body doubling sessions'
+    ],
+    specialFeatures: ['Body Doubling', 'Hack Sharing', 'Support Circles']
+  },
+  127: {
+    category: 'Entertainment',
+    tags: ['dungeons-daddies', 'podcast', 'dnd', 'comedy', 'actual-play', 'fans'],
+    activityLevel: 'medium',
+    communityVibe: 'Fans of the hit D&D comedy podcast',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Episode discussions and theories',
+      'Fan art and fanfic sharing',
+      'Spin-off game sessions'
+    ],
+    specialFeatures: ['Episode Threads', 'Fan Art', 'Inspired Games']
+  },
+  128: {
+    category: 'Lifestyle',
+    tags: ['vegan', 'cooking', 'recipes', 'plant-based', 'healthy', 'sustainable'],
+    activityLevel: 'medium',
+    communityVibe: 'Plant-based cooks sharing delicious recipes',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Beginner-friendly recipe guides',
+      'Ingredient substitution help',
+      'Meal prep ideas and tips'
+    ],
+    specialFeatures: ['Recipe Database', 'Meal Prep', 'Substitutions']
+  },
+  129: {
+    category: 'Gaming',
+    tags: ['solo-rpg', 'journaling', 'ironsworn', 'mythic', 'ttrpg', 'alone', 'narrative'],
+    activityLevel: 'low',
+    communityVibe: 'Solo adventurers telling their stories',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Solo RPG system recommendations',
+      'Journaling technique sharing',
+      'Actual play logs and inspiration'
+    ],
+    specialFeatures: ['System Guides', 'AP Logs', 'Oracle Tools']
+  },
+  130: {
+    category: 'Creative',
+    tags: ['maps', 'ttrpg', 'dungeondraft', 'inkarnate', 'tokens', 'assets', 'battle-maps'],
+    activityLevel: 'high',
+    communityVibe: 'Map artists creating stunning worlds',
+    experienceLevel: 'all',
+    whyJoin: [
+      'Free map asset libraries',
+      'Software tutorials and tips',
+      'Commission opportunities'
+    ],
+    specialFeatures: ['Asset Library', 'Tutorials', 'Commissions']
   }
 };

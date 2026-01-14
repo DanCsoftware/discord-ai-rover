@@ -417,6 +417,26 @@ export class ServerDiscoveryEngine {
   getDiscoveryRecommendations(query?: string): ServerRecommendation[] {
     const recommendations: ServerRecommendation[] = [];
     
+    // Skill level keywords detection
+    const detectSkillLevel = (q: string): 'beginner' | 'intermediate' | 'advanced' | null => {
+      const lower = q.toLowerCase();
+      if (lower.includes('beginner') || lower.includes('new') || lower.includes('newbie') || 
+          lower.includes('learn') || lower.includes('first time') || lower.includes('starting out') ||
+          lower.includes('never played')) {
+        return 'beginner';
+      }
+      if (lower.includes('advanced') || lower.includes('veteran') || lower.includes('experienced') ||
+          lower.includes('hardcore') || lower.includes('expert') || lower.includes('serious')) {
+        return 'advanced';
+      }
+      if (lower.includes('intermediate') || lower.includes('some experience')) {
+        return 'intermediate';
+      }
+      return null;
+    };
+    
+    const requestedSkillLevel = query ? detectSkillLevel(query) : null;
+    
     // Use discoverable servers (not joined by user)
     discoverableServers.forEach(server => {
       const meta = discoveryMetadata[server.id];
@@ -427,6 +447,23 @@ export class ServerDiscoveryEngine {
       
       if (query) {
         const lowerQuery = query.toLowerCase();
+        
+        // Skill level matching - significant boost
+        if (requestedSkillLevel && meta.experienceLevel) {
+          if (meta.experienceLevel === requestedSkillLevel) {
+            matchScore += 0.35;
+            if (requestedSkillLevel === 'beginner') {
+              matchReasons.push('Perfect for first-time players!');
+            } else if (requestedSkillLevel === 'advanced') {
+              matchReasons.push('For experienced players seeking challenge');
+            } else {
+              matchReasons.push('Great for growing your skills');
+            }
+          } else if (meta.experienceLevel === 'all') {
+            matchScore += 0.15;
+            matchReasons.push('Welcomes all skill levels');
+          }
+        }
         
         // Check category match
         if (meta.category.toLowerCase().includes(lowerQuery)) {
@@ -447,6 +484,14 @@ export class ServerDiscoveryEngine {
         if (server.name.toLowerCase().includes(lowerQuery)) {
           matchScore += 0.25;
           matchReasons.push('Direct match for your search');
+        }
+        
+        // D&D/Tabletop specific
+        if (lowerQuery.includes('d&d') || lowerQuery.includes('dnd') || lowerQuery.includes('dungeons')) {
+          if (meta.tags.some(t => ['dnd', 'dungeons-dragons', 'ttrpg', 'tabletop'].includes(t))) {
+            matchScore += 0.2;
+            matchReasons.push('D&D community');
+          }
         }
         
         // Activity keywords
