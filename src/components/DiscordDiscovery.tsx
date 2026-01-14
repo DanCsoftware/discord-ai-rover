@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, Sparkles, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Sparkles, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { servers, serverDiscoveryData, discoverableServers, discoveryMetadata, userJoinedServerIds } from "@/data/discordData";
 import { discordApps, appCategories } from "@/data/appsData";
 import DiscordDiscoverSidebar from "./DiscordDiscoverSidebar";
@@ -8,8 +8,8 @@ import DiscoverAppCard from "./DiscoverAppCard";
 import RoverRecommendationCard from "./RoverRecommendationCard";
 import RoverAvatar from "./RoverAvatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRoverChat } from "@/hooks/useRoverChat";
-import { serverDiscovery, ServerRecommendation } from "@/utils/serverDiscovery";
+import { useServerDiscovery, ServerRecommendation } from "@/hooks/useServerDiscovery";
+import { toast } from "sonner";
 
 interface DiscordDiscoveryProps {
   onServerClick: (serverId: number) => void;
@@ -21,44 +21,27 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
   const [activeAppCategory, setActiveAppCategory] = useState<string>('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [roverQuery, setRoverQuery] = useState('');
-  const [roverAcknowledgment, setRoverAcknowledgment] = useState('');
-  const [recommendations, setRecommendations] = useState<ServerRecommendation[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
   
-  const { streamingResponse, isStreaming, sendMessage } = useRoverChat();
+  // Use AI-powered server discovery hook
+  const { recommendations, isLoading: isSearching, error: discoveryError, discoverServers } = useServerDiscovery();
 
-  const interestTags = ['Gaming', 'Music', 'Art', 'Tech', 'Anime', 'Fitness', 'Learning', 'Creative'];
+  const interestTags = ['Gaming', 'Music', 'Art', 'Tech', 'Anime', 'Fitness', 'Learning', 'D&D'];
+
+  // Show error toast when discovery fails
+  useEffect(() => {
+    if (discoveryError) {
+      toast.error(discoveryError);
+    }
+  }, [discoveryError]);
 
   const handleRoverSearch = async (query: string) => {
     if (!query.trim()) return;
     
     setHasSearched(true);
-    setIsSearching(true);
-    setRoverAcknowledgment('');
-    setRecommendations([]);
     
-    // Get recommendations based on query (but don't show them yet)
-    const recs = serverDiscovery.getDiscoveryRecommendations(query);
-    
-    try {
-      // Get a brief acknowledgment from AI
-      const response = await sendMessage(
-        `User is looking for Discord communities about: "${query}". Give a brief, friendly 1-2 sentence acknowledgment about what you found. Don't list servers, just acknowledge their interest. Keep it under 30 words.`,
-        { channelName: 'discovery', serverName: 'Discovery', messages: [] }
-      );
-      
-      setRoverAcknowledgment(response);
-    } catch (e) {
-      console.error('ROVER search error:', e);
-      setRoverAcknowledgment(`Found ${recs.length} communities for "${query}"! Check them out below.`);
-    }
-    
-    // Add realistic delay before showing results
-    setTimeout(() => {
-      setRecommendations(recs);
-      setIsSearching(false);
-    }, 800);
+    // Call AI-powered discovery
+    await discoverServers(query);
   };
 
   const handleTagClick = (tag: string) => {
@@ -236,7 +219,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                 <div className="p-6">
                   <div className="flex items-start gap-4">
                     {/* ROVER Avatar - Discord-style */}
-                    <RoverAvatar size="lg" isThinking={isStreaming} showVerified={true} />
+                    <RoverAvatar size="lg" isThinking={isSearching} showVerified={true} />
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -254,7 +237,7 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                           <button
                             key={tag}
                             onClick={() => handleTagClick(tag)}
-                            disabled={isStreaming}
+                            disabled={isSearching}
                             className="px-3 py-1 rounded-full text-xs font-medium transition-all hover:scale-105 disabled:opacity-50"
                             style={{ 
                               backgroundColor: 'rgba(255,255,255,0.15)',
@@ -282,20 +265,20 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                             onChange={(e) => setRoverQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleRoverSearch(roverQuery)}
                             placeholder="I want to find communities about..."
-                            disabled={isStreaming}
+                            disabled={isSearching}
                             className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder:text-white/50"
                           />
                         </div>
                         <button
                           onClick={() => handleRoverSearch(roverQuery)}
-                          disabled={isStreaming || !roverQuery.trim()}
+                          disabled={isSearching || !roverQuery.trim()}
                           className="px-4 py-2.5 rounded-lg font-semibold text-sm transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
                           style={{ 
                             backgroundColor: 'white',
                             color: '#5865f2'
                           }}
                         >
-                          {isStreaming ? (
+                          {isSearching ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <>
@@ -309,8 +292,8 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                   </div>
                 </div>
                 
-                {/* Brief Acknowledgment (not long text) */}
-                {(hasSearched && (streamingResponse || roverAcknowledgment)) && (
+                {/* Status message */}
+                {hasSearched && (
                   <div 
                     className="px-6 py-3 flex items-center gap-3"
                     style={{ 
@@ -318,17 +301,33 @@ const DiscordDiscovery = ({ onServerClick }: DiscordDiscoveryProps) => {
                       borderTop: '1px solid rgba(255,255,255,0.1)'
                     }}
                   >
-                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
-                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                      {isStreaming ? (
-                        <>
-                          {streamingResponse}
-                          <span className="animate-pulse">▋</span>
-                        </>
-                      ) : (
-                        roverAcknowledgment || `Found ${recommendations.length} communities for you!`
-                      )}
-                    </p>
+                    {discoveryError ? (
+                      <>
+                        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                        <p className="text-sm text-red-300">{discoveryError}</p>
+                      </>
+                    ) : isSearching ? (
+                      <>
+                        <Loader2 className="w-5 h-5 text-blue-400 flex-shrink-0 animate-spin" />
+                        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                          ROVER is analyzing communities for "{roverQuery}"...
+                        </p>
+                      </>
+                    ) : recommendations.length > 0 ? (
+                      <>
+                        <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                          Found {recommendations.length} communities matching "{roverQuery}"!
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                          No strong matches found for "{roverQuery}". Try different keywords!
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
                 

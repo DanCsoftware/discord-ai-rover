@@ -20,12 +20,14 @@ const RoverRecommendationCard = ({
 }: RoverRecommendationCardProps) => {
   const scorePercent = Math.round(matchScore * 100);
   
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'from-green-400 to-emerald-500';
-    if (score >= 75) return 'from-blue-400 to-indigo-500';
-    if (score >= 60) return 'from-purple-400 to-violet-500';
-    return 'from-amber-400 to-orange-500';
+  const getMatchBadge = (score: number) => {
+    if (score >= 90) return { label: 'Excellent match', color: 'from-green-400 to-emerald-500' };
+    if (score >= 75) return { label: 'Great match', color: 'from-blue-400 to-indigo-500' };
+    if (score >= 60) return { label: 'Good match', color: 'from-yellow-400 to-amber-500' };
+    return { label: `${score}% match`, color: 'from-gray-400 to-gray-500' };
   };
+
+  const matchBadge = getMatchBadge(scorePercent);
 
   const getActivityBadge = (level?: string) => {
     switch (level) {
@@ -66,9 +68,9 @@ const RoverRecommendationCard = ({
         
         {/* Match Score Badge */}
         <div 
-          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${getScoreColor(scorePercent)} shadow-lg`}
+          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${matchBadge.color} shadow-lg`}
         >
-          {scorePercent}% match
+          {matchBadge.label}
         </div>
 
         {/* Verified Badge */}
